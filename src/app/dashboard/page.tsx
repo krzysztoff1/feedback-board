@@ -22,7 +22,7 @@ export default async function Home() {
         <>Nothing yet :/</>
       )}
       {userBoards.length >= MAX_NUMBER_OF_BOARDS ? (
-        <>Uh oh! You've reached the maximum number of boards.</>
+        <>{`Uh oh! You've reached the maximum number of boards.`}</>
       ) : (
         <CreateBoardForm />
       )}
