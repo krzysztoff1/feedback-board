@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardFooter } from "~/components/ui/card";
 import { getRelativeTimeString } from "~/lib/utils";
