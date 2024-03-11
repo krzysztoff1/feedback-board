@@ -1,6 +1,7 @@
+import { memo } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
 
-export function SkeletonCard() {
+export const SkeletonCard = memo(() => {
   return (
     <div className="flex max-w-[100%] flex-col space-y-3">
       <Skeleton className="h-[125px] rounded-xl" />
@@ -10,4 +11,6 @@ export function SkeletonCard() {
       </div>
     </div>
   );
-}
+});
+
+SkeletonCard.displayName = "SkeletonCard";

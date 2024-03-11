@@ -3,24 +3,25 @@ import { BoardCard } from "../_components/board-card";
 import { MAX_NUMBER_OF_BOARDS } from "~/lib/constants";
 import { api } from "~/trpc/server";
 import { getServerAuthSession } from "~/server/auth";
+import { redirect } from "next/navigation";
 
-export default async function Home() {
+export default async function Dashboard() {
   const session = await getServerAuthSession();
 
   if (!session?.user) {
-    return null;
+    redirect("/");
   }
 
   const userBoards = await api.boards.get.query();
 
   return (
-    <>
+    <div className="flex flex-col gap-4 sm:gap-8">
       {userBoards.length > 0 ? (
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row">
           {userBoards.map((board) => (
             <BoardCard
               key={board.id}
-              href={`/dashboard/board/${board.id}`}
+              href={`/dashboard/${board.id}`}
               {...board}
             />
           ))}
@@ -33,6 +34,6 @@ export default async function Home() {
       ) : (
         <CreateBoardForm />
       )}
-    </>
+    </div>
   );
 }

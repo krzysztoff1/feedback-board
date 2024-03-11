@@ -1,12 +1,23 @@
 import { unstable_noStore as noStore } from "next/cache";
-import { AuthForm } from "./_components/auth-form";
+import { getProviders } from "next-auth/react";
+import { getServerAuthSession } from "~/server/auth";
+import { redirect } from "next/navigation";
+import { AuthForm } from "./_components/auth/auth-form";
 
 export default async function Home() {
   noStore();
 
+  const session = await getServerAuthSession();
+
+  if (session) {
+    redirect("/dashboard");
+  }
+
+  const providers = await getProviders();
+
   return (
     <main className="grid min-h-screen place-content-center">
-      <AuthForm />
+      <AuthForm providers={providers} />
     </main>
   );
 }

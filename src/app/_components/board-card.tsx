@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardFooter } from "~/components/ui/card";
 import { getRelativeTimeString } from "~/lib/utils";
+import { memo } from "react";
 
 interface BoardCardProps {
   readonly name: string | null;
@@ -8,9 +9,9 @@ interface BoardCardProps {
   readonly href: string;
 }
 
-export const BoardCard = ({ name, href, createdAt }: BoardCardProps) => {
+export const BoardCard = memo(({ name, href, createdAt }: BoardCardProps) => {
   return (
-    <Card className="stretched-link-container">
+    <Card className="stretched-link-container transiton-bg bg-card transition hover:bg-muted">
       <CardHeader>
         <CardTitle>
           <Link href={href} className="stretched-link">
@@ -20,9 +21,11 @@ export const BoardCard = ({ name, href, createdAt }: BoardCardProps) => {
       </CardHeader>
       <CardFooter>
         <p>
-          Created: <time> {getRelativeTimeString(createdAt)}</time>
+          Created: <time>{getRelativeTimeString(createdAt)}</time>
         </p>
       </CardFooter>
     </Card>
   );
-};
+});
+
+BoardCard.displayName = "BoardCard";
