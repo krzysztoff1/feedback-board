@@ -20,7 +20,7 @@ import { type AdapterAccount } from "next-auth/adapters";
 export const createTable = pgTableCreator((name) => `feedback-board_${name}`);
 
 export const boards = createTable(
-  "board",
+  "boards",
   {
     id: serial("id").primaryKey(),
     name: varchar("name", { length: 256 }),

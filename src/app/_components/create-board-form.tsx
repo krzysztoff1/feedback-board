@@ -15,6 +15,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { api } from "~/trpc/react";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   name: z.string().min(1).max(256),
@@ -25,14 +26,16 @@ export const CreateBoardForm = () => {
     resolver: zodResolver(formSchema),
     defaultValues: { name: "" },
   });
+  const router = useRouter();
   const handler = api.board.create.useMutation({
     onSettled: () => {
       form.reset();
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     handler.mutate(values);
+    router.refresh();
   };
 
   return (
