@@ -1,4 +1,4 @@
-import { SkeletonCard } from "../_components/skeleton-card";
+import { SkeletonCard } from "../_components/dashboard/skeleton-card";
 
 export default async function Loading() {
   return (
