@@ -27,7 +27,7 @@ export const CreateBoardForm = () => {
     defaultValues: { name: "" },
   });
   const router = useRouter();
-  const handler = api.board.create.useMutation({
+  const handler = api.boards.create.useMutation({
     onSettled: () => {
       form.reset();
     },

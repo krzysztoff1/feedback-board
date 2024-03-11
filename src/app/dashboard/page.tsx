@@ -1,10 +1,17 @@
-import { api } from "~/trpc/server";
 import { CreateBoardForm } from "../_components/create-board-form";
 import { BoardCard } from "../_components/board-card";
 import { MAX_NUMBER_OF_BOARDS } from "~/lib/constants";
+import { api } from "~/trpc/server";
+import { getServerAuthSession } from "~/server/auth";
 
 export default async function Home() {
-  const userBoards = await api.board.get.query();
+  const session = await getServerAuthSession();
+
+  if (!session?.user) {
+    return null;
+  }
+
+  const userBoards = await api.boards.get.query();
 
   return (
     <>
