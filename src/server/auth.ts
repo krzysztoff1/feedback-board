@@ -11,6 +11,10 @@ import { env } from "~/env";
 import { db } from "~/server/db";
 import { createTable } from "~/server/db/schema";
 
+const useSecureCookies = process.env.NEXTAUTH_URL!.startsWith("https://");
+const cookiePrefix = useSecureCookies ? "__Secure-" : "";
+const hostName = new URL(process.env.NEXTAUTH_URL!).hostname;
+
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
@@ -65,6 +69,18 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: "/auth/signin",
+  },
+  cookies: {
+    sessionToken: {
+      name: `${cookiePrefix}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        path: "/",
+        domain: "." + hostName,
+        secure: useSecureCookies,
+      },
+    },
   },
 };
 
