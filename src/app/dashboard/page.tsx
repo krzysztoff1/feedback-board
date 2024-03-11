@@ -7,14 +7,12 @@ import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
   const session = await getServerAuthSession();
-  console.log(session);
 
   if (!session?.user) {
     redirect("/");
   }
 
   const userBoards = await api.boards.get.query();
-  console.log(userBoards);
 
   return (
     <div className="flex flex-col gap-4 sm:gap-8">
