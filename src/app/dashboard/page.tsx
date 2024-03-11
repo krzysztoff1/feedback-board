@@ -10,7 +10,7 @@ export default async function Dashboard() {
     redirect("/");
   }
 
-  const userBoards = await api.boards.get.query();
+  const userBoards = await api.boards.getAll.query();
 
   return (
     <div className="flex flex-col gap-4 sm:gap-8">
