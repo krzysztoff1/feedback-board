@@ -17,6 +17,9 @@ export default async function Home() {
 
   return (
     <main className="grid min-h-screen place-content-center">
+      <section className="mb-8">
+        <h1 className="text-center text-3xl font-bold">Feedback Board</h1>
+      </section>
       <AuthForm providers={providers} />
     </main>
   );
