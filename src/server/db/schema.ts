@@ -10,7 +10,6 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
-import type { ExtractTablesWithRelations } from "drizzle-orm";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -46,7 +45,7 @@ export const boards = createTable(
 export const users = createTable("user", {
   id: varchar("id", { length: 255 }).notNull().primaryKey(),
   name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }),
   emailVerified: timestamp("emailVerified", {
     mode: "date",
   }).default(sql`CURRENT_TIMESTAMP`),

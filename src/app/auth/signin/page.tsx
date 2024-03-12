@@ -8,12 +8,13 @@ import {
   CardContent,
 } from "~/components/ui/card";
 import { AuthForm } from "~/app/_components/auth/auth-form";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
   const session = await getServerAuthSession();
 
   if (session) {
-    return { redirect: { destination: "/dashboard" } };
+    return redirect("/");
   }
 
   const providers = await getProviders();

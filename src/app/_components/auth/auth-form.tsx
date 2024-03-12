@@ -10,7 +10,7 @@ interface AuthFormProps {
 
 export const AuthForm = memo(({ providers }: AuthFormProps) => {
   return (
-    <>
+    <div className="flex flex-col gap-4">
       {Object.values(providers ?? {}).map((provider) => (
         <Button
           key={provider.id}
@@ -20,7 +20,7 @@ export const AuthForm = memo(({ providers }: AuthFormProps) => {
           Sign in with <strong className="ml-1">{provider.name}</strong>
         </Button>
       ))}
-    </>
+    </div>
   );
 });
 
