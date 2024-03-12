@@ -15,6 +15,8 @@ export default async function Home() {
 
   const providers = await getProviders();
 
+  console.log(providers);
+
   return (
     <main className="grid min-h-screen place-content-center">
       <section className="mb-8">
