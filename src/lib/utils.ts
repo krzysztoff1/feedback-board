@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getUserLocale() {
-  return navigator.language;
+  return typeof window !== "undefined" ? navigator.language : "en-US";
 }
 
 export function getRelativeTimeString(
