@@ -41,7 +41,7 @@ export default async function Dashboard({
   const session = await getServerAuthSession();
 
   if (!session?.user) {
-    redirect("/");
+    redirect("/auth/signin");
   }
 
   const userBoards = await api.boards.getAll.query();
