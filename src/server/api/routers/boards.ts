@@ -4,26 +4,35 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { boards } from "~/server/db/schema";
 
 export const boardsRouter = createTRPCRouter({
-  getAll: protectedProcedure.query(({ ctx }) => {
+  getAll: protectedProcedure.query(async ({ ctx }) => {
     const uid = ctx.session.user.id;
     return ctx.db.select().from(boards).where(eq(boards.ownerId, uid));
   }),
   get: protectedProcedure
-    .input(z.object({ id: z.number() }))
+    .input(
+      z.object({
+        slug: z.string(),
+      }),
+    )
     .query(async ({ input, ctx }) => {
       const uid = ctx.session.user.id;
 
       return ctx.db.query.boards.findFirst({
         where(fields, operators) {
           return and(
-            operators.eq(fields.id, input.id),
+            operators.eq(fields.slug, input.slug),
             operators.eq(fields.ownerId, uid),
           );
         },
       });
     }),
   create: protectedProcedure
-    .input(z.object({ name: z.string().min(1) }))
+    .input(
+      z.object({
+        name: z.string().min(1).max(256),
+        slug: z.string().min(1).max(256),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const uid = ctx.session.user.id;
 
@@ -31,6 +40,28 @@ export const boardsRouter = createTRPCRouter({
         createdById: uid,
         ownerId: uid,
         name: input.name,
+        slug: input.slug,
       });
+    }),
+  edit: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().min(1).max(256).optional(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const promises = [];
+
+      for (const [key, value] of Object.entries(input)) {
+        if (value) {
+          promises.push(
+            ctx.db.update(boards).set({
+              [key]: value,
+            }),
+          );
+        }
+      }
+
+      await Promise.all(promises);
     }),
 });

@@ -1,0 +1,1 @@
+ALTER TABLE "feedback-board_boards" ADD CONSTRAINT "feedback-board_boards_slug_unique" UNIQUE("slug");

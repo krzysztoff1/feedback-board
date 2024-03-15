@@ -21,7 +21,7 @@ export const Boards = memo(({ userBoards: _userBoards }: BoardCardProps) => {
           {userBoards.map((board) => (
             <BoardCard
               key={board.id}
-              href={`/dashboard/${board.id}`}
+              href={`/dashboard/${board.slug}`}
               {...board}
             />
           ))}
