@@ -11,6 +11,20 @@ export default async function Dashboard({
   const targetHostName = String(searchParams.targetHostName) ?? "";
   const isSubdomainValid =
     targetHostName.split(".").length > 2 && targetHostName !== "";
+  const returnToBoard = String(searchParams.returnToBoard);
+
+  if (returnToBoard) {
+    const prodReturnUrl = new URL("/", `https://${returnToBoard}.goog.info`);
+
+    prodReturnUrl.searchParams.set("isRecentlySignedIn", "true");
+
+    const redirectUrl =
+      process.env.NODE_ENV === "production"
+        ? prodReturnUrl.href
+        : `/view/${returnToBoard}`;
+
+    redirect(redirectUrl);
+  }
 
   if (isSubdomainValid) {
     const redirectUrl = new URL("/", `https://${targetHostName}`);

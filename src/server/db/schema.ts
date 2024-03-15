@@ -50,6 +50,7 @@ export const suggestions = createTable(
     boardId: integer("boardId")
       .notNull()
       .references(() => boards.id),
+    title: varchar("title", { length: 255 }),
     content: text("content").notNull(),
     createdBy: varchar("createdBy", { length: 255 })
       .notNull()
