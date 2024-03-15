@@ -11,6 +11,7 @@ export default async function Home() {
   const headersList = headers();
   const hostName = headersList.get("x-hostname") ?? "";
   const isSubdomain = hostName.split(".").length > 2;
+  const session = await getServerAuthSession();
 
   if (isSubdomain) {
     return (
@@ -18,6 +19,7 @@ export default async function Home() {
         <section className="mb-8">
           <h1 className="text-center text-3xl font-bold">
             This board does not exist
+            {session ? session.user.name : "not logged in"}
           </h1>
         </section>
       </main>
@@ -25,7 +27,6 @@ export default async function Home() {
   }
 
   const providers = await getProviders();
-  const session = await getServerAuthSession();
 
   if (session) {
     redirect("/dashboard");
