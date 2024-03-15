@@ -7,9 +7,20 @@ export default async function Home() {
   noStore();
 
   const headersList = headers();
+  const hostName = headersList.get("x-hostname") ?? "";
+  const isSubdomain = hostName.split(".").length > 2;
 
-  console.log("x-url", headersList.get("x-url"));
-  console.log("x-hostname", headersList.get("x-hostname"));
+  if (isSubdomain) {
+    return (
+      <main className="grid min-h-screen place-content-center">
+        <section className="mb-8">
+          <h1 className="text-center text-3xl font-bold">
+            This board does not exist
+          </h1>
+        </section>
+      </main>
+    );
+  }
 
   const providers = await getProviders();
 
@@ -18,6 +29,7 @@ export default async function Home() {
       <section className="mb-8">
         <h1 className="text-center text-3xl font-bold">Feedback Board</h1>
       </section>
+
       <AuthForm providers={providers} />
     </main>
   );
