@@ -16,7 +16,7 @@ export default async function Page() {
   const session = await getServerAuthSession();
 
   if (session) {
-    return redirect("/");
+    return redirect("/dashboard");
   }
 
   const providers = await getProviders();
