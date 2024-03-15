@@ -16,9 +16,9 @@ export const AuthForm = memo(({ providers }: AuthFormProps) => {
       {Object.values(providers ?? {}).map((provider) => (
         <Button
           key={provider.id}
-          onClick={() => {
+          onClick={async () => {
             setCurrentlSignedIn(provider.id);
-            signIn(provider.id);
+            await signIn(provider.id);
           }}
           variant={"default"}
           disabled={currentlSignedIn !== null}
