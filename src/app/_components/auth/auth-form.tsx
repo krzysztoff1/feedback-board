@@ -24,7 +24,14 @@ export const AuthForm = memo(
             onClick={async () => {
               setCurrentlSignedIn(provider.id);
 
+              const pageSearchParams = new URLSearchParams(
+                window.location.search,
+              );
               const params = new URLSearchParams(signInCallbackSearchParams);
+              params.append(
+                "targetHostName",
+                pageSearchParams.get("targetHostName")!,
+              );
 
               await signIn(provider.id, {
                 callbackUrl: `/dashboard?${params.toString()}`,

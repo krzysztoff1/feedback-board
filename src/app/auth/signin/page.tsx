@@ -21,12 +21,13 @@ export default async function Page() {
 
   const providers = await getProviders();
   const headersList = headers();
+
   const hostName = headersList.get("x-hostname") ?? "";
   const isSubdomain = hostName.split(".").length > 2;
 
   if (isSubdomain) {
     const searchParams = new URLSearchParams();
-    searchParams.append("hostName", hostName);
+    searchParams.append("targetHostName", hostName);
     searchParams.append("isSubdomain", String(isSubdomain));
 
     redirect(`${SITE_URL}/auth/signin?${searchParams.toString()}`);
