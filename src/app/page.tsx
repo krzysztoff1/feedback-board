@@ -2,6 +2,8 @@ import { unstable_noStore as noStore } from "next/cache";
 import { getProviders } from "next-auth/react";
 import { AuthForm } from "./_components/auth/auth-form";
 import { headers } from "next/headers";
+import { getServerAuthSession } from "~/server/auth";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   noStore();
@@ -23,6 +25,11 @@ export default async function Home() {
   }
 
   const providers = await getProviders();
+  const session = await getServerAuthSession();
+
+  if (session) {
+    redirect("/dashboard");
+  }
 
   return (
     <main className="grid min-h-screen place-content-center">
