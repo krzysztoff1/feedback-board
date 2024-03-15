@@ -14,8 +14,6 @@ import { createTable } from "~/server/db/schema";
 
 const useSecureCookies = !!process.env.VERCEL_URL;
 
-console.log("VERCEL_URL", process.env.VERCEL_URL);
-
 const domain =
   process.env.NODE_ENV === "production" ? process.env.VERCEL_URL : "localhost";
 
@@ -79,18 +77,6 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: "/auth/signin",
-  },
-  cookies: {
-    sessionToken: {
-      name: `${useSecureCookies ? "__Secure-" : ""}next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: useSecureCookies,
-        domain,
-      },
-    },
   },
 };
 
