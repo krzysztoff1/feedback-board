@@ -4,6 +4,9 @@ import { AuthForm } from "./_components/auth/auth-form";
 import { headers } from "next/headers";
 import { getServerAuthSession } from "~/server/auth";
 import { redirect } from "next/navigation";
+import { api } from "~/trpc/server";
+import { PublicBoard } from "~/components/public-board/PublicBoard";
+import { SITE_URL } from "~/lib/constants";
 
 export default async function Home() {
   noStore();
@@ -11,19 +14,18 @@ export default async function Home() {
   const headersList = headers();
   const hostName = headersList.get("x-hostname") ?? "";
   const isSubdomain = hostName.split(".").length > 2;
+  const firstPartOfHostName = hostName.split(".")[0];
   const session = await getServerAuthSession();
+  const board = firstPartOfHostName
+    ? await api.boards.get.query({ slug: firstPartOfHostName })
+    : undefined;
+
+  if (board) {
+    return <PublicBoard board={board} />;
+  }
 
   if (isSubdomain) {
-    return (
-      <main className="grid min-h-screen place-content-center">
-        <section className="mb-8">
-          <h1 className="text-center text-3xl font-bold">
-            This board does not exist
-          </h1>
-          <span>{session ? session.user.name : "not logged in"}</span>
-        </section>
-      </main>
-    );
+    redirect(SITE_URL);
   }
 
   const providers = await getProviders();
