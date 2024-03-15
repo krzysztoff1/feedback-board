@@ -9,16 +9,18 @@ export default async function Dashboard({
   searchParams: Record<string, string | string[] | undefined>;
 }) {
   const targetHostName = String(searchParams.targetHostName) ?? "";
-  const isCallback = Boolean(searchParams.callback);
-  const isSubdomain = targetHostName.split(".").length > 2;
+  const isSubdomainValid =
+    targetHostName.split(".").length > 2 && targetHostName !== "";
 
-  if (isSubdomain && !isCallback) {
+  if (isSubdomainValid) {
     const redirectUrl = new URL("/", `https://${targetHostName}`);
+
     for (const [key, value] of Object.entries(searchParams)) {
       if (key !== "hostName" && value) {
         redirectUrl.searchParams.set(key, String(value));
       }
     }
+
     redirect(redirectUrl.href);
   }
 
