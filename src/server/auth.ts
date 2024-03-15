@@ -15,7 +15,7 @@ import { createTable } from "~/server/db/schema";
 const useSecureCookies = !!process.env.VERCEL_URL;
 
 const domain =
-  process.env.NODE_ENV === "production" ? ".goog.info" : ".localhost";
+  process.env.NODE_ENV === "production" ? ".goog.info" : "localhost";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
