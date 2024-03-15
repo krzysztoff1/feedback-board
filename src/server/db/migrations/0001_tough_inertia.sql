@@ -1,0 +1,1 @@
+ALTER TABLE "feedback-board_boards" ADD COLUMN "slug" varchar(256);

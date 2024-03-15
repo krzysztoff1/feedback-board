@@ -9,5 +9,5 @@ export default {
     connectionString: env.DATABASE_URL,
   },
   tablesFilter: ["feedback-board_*"],
-  out: "./src/server/db",
+  out: "./src/server/db/migrations",
 } satisfies Config;

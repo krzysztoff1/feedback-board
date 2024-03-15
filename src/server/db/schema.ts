@@ -24,6 +24,7 @@ export const boards = createTable(
   {
     id: serial("id").primaryKey(),
     name: varchar("name", { length: 256 }),
+    slug: varchar("slug", { length: 256 }),
     createdById: varchar("createdById", { length: 255 })
       .notNull()
       .references(() => users.id),
