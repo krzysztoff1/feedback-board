@@ -28,7 +28,13 @@ export default async function Home() {
       page: 0,
     });
 
-    return <PublicBoard suggestions={suggestions} board={board} />;
+    return (
+      <PublicBoard
+        suggestions={suggestions}
+        board={board}
+        isLoggedIn={Boolean(session)}
+      />
+    );
   }
 
   if (isSubdomain) {
