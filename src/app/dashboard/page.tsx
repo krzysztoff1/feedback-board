@@ -11,7 +11,9 @@ export default async function Dashboard({
   const targetHostName = String(searchParams.targetHostName) ?? "";
   const isSubdomainValid =
     targetHostName.split(".").length > 2 && targetHostName !== "";
-  const returnToBoard = String(searchParams.returnToBoard);
+  const returnToBoard = searchParams.returnToBoard
+    ? String(searchParams.returnToBoard)
+    : "";
 
   if (returnToBoard) {
     const prodReturnUrl = new URL("/", `https://${returnToBoard}.goog.info`);
