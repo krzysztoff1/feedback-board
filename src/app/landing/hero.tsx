@@ -15,21 +15,23 @@ const ButtonRotateBorder = () => {
 
 export const Hero = memo(() => {
   return (
-    <div className="flex h-[75vh] flex-col items-center justify-center px-4">
+    <>
       <Spotlight fill="white" />
-      <h1 className="balance text-center text-4xl font-bold text-white">
-        Suggestion board your way
-      </h1>
-      <p className="mt-4 text-center text-white/90">
-        Free and open source <i>forever</i>
-      </p>
+      <div className="flex h-[75vh] flex-col items-center justify-center px-4">
+        <h1 className="balance text-center text-4xl font-bold text-white">
+          Suggestion board your way
+        </h1>
+        <p className="mt-4 text-center text-white/90">
+          Free and open source <i>forever</i>
+        </p>
 
-      <div className="mt-8">
-        <Link href="/auth/signin">
-          <ButtonRotateBorder />
-        </Link>
+        <div className="mt-8">
+          <Link href="/auth/signin">
+            <ButtonRotateBorder />
+          </Link>
+        </div>
       </div>
-    </div>
+    </>
   );
 });
 

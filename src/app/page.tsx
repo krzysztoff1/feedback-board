@@ -6,6 +6,8 @@ import { api } from "~/trpc/server";
 import { PublicBoard } from "~/components/public-board/PublicBoard";
 import { SITE_URL } from "~/lib/constants";
 import { Hero } from "./landing/hero";
+import { Features } from "./landing/bento";
+import { Footer } from "./landing/footer";
 
 export default async function Home() {
   noStore();
@@ -41,8 +43,10 @@ export default async function Home() {
   }
 
   return (
-    <main className="flex h-screen flex-col items-center justify-start">
+    <main className="flex min-h-screen flex-col items-center justify-start">
       <Hero />
+      <Features />
+      <Footer />
     </main>
   );
 }
