@@ -12,11 +12,6 @@ import { env } from "~/env";
 import { db } from "~/server/db";
 import { createTable } from "~/server/db/schema";
 
-const useSecureCookies = !!process.env.VERCEL_URL;
-
-const domain =
-  process.env.NODE_ENV === "production" ? process.env.VERCEL_URL : "localhost";
-
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
