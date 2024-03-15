@@ -9,6 +9,7 @@ import {
 } from "~/components/ui/card";
 import { AuthForm } from "~/app/_components/auth/auth-form";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
 export default async function Page() {
   const session = await getServerAuthSession();
@@ -18,6 +19,9 @@ export default async function Page() {
   }
 
   const providers = await getProviders();
+  const headersList = headers();
+  const hostName = headersList.get("x-hostname") ?? "";
+  const isSubdomain = hostName.split(".").length > 2;
 
   return (
     <main className="grid min-h-screen place-content-center">
@@ -26,8 +30,14 @@ export default async function Page() {
           <CardTitle>Login</CardTitle>
         </CardHeader>
         <CardContent>
-          {" "}
-          <AuthForm providers={providers} />{" "}
+          <AuthForm
+            providers={providers}
+            signInCallbackSearchParams={{
+              isSubdomain: String(isSubdomain),
+              callback: String(true),
+              hostName,
+            }}
+          />
         </CardContent>
         <CardFooter></CardFooter>
       </Card>

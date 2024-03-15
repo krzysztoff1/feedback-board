@@ -37,7 +37,14 @@ export default async function Home() {
         <h1 className="text-center text-3xl font-bold">Feedback Board</h1>
       </section>
 
-      <AuthForm providers={providers} />
+      <AuthForm
+        providers={providers}
+        signInCallbackSearchParams={{
+          isSubdomain: String(isSubdomain),
+          callback: String(true),
+          hostName,
+        }}
+      />
     </main>
   );
 }
