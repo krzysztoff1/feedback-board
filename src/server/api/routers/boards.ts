@@ -1,6 +1,10 @@
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import { boards } from "~/server/db/schema";
 
 export const boardsRouter = createTRPCRouter({
@@ -23,6 +27,19 @@ export const boardsRouter = createTRPCRouter({
             operators.eq(fields.slug, input.slug),
             operators.eq(fields.ownerId, uid),
           );
+        },
+      });
+    }),
+  getPublic: publicProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      return ctx.db.query.boards.findFirst({
+        where(fields, operators) {
+          return operators.eq(fields.slug, input.slug);
         },
       });
     }),

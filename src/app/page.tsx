@@ -16,9 +16,10 @@ export default async function Home() {
   const isSubdomain = hostName.split(".").length > 2;
   const firstPartOfHostName = hostName.split(".")[0];
   const session = await getServerAuthSession();
-  const board = firstPartOfHostName
-    ? await api.boards.get.query({ slug: firstPartOfHostName })
-    : undefined;
+  const board =
+    firstPartOfHostName && isSubdomain
+      ? await api.boards.getPublic.query({ slug: firstPartOfHostName })
+      : undefined;
 
   if (board) {
     return <PublicBoard board={board} />;
