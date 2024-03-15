@@ -10,6 +10,7 @@ import {
 import { AuthForm } from "~/app/_components/auth/auth-form";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { SITE_URL } from "~/lib/constants";
 
 export default async function Page() {
   const session = await getServerAuthSession();
@@ -22,6 +23,14 @@ export default async function Page() {
   const headersList = headers();
   const hostName = headersList.get("x-hostname") ?? "";
   const isSubdomain = hostName.split(".").length > 2;
+
+  if (isSubdomain) {
+    const searchParams = new URLSearchParams();
+    searchParams.append("hostName", hostName);
+    searchParams.append("isSubdomain", String(isSubdomain));
+
+    redirect(`${SITE_URL}/auth/signin?${searchParams.toString()}`);
+  }
 
   return (
     <main className="grid min-h-screen place-content-center">
