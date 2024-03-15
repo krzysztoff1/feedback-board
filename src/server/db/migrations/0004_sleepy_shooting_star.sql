@@ -1,0 +1,1 @@
+ALTER TABLE "feedback-board_suggestions" ADD COLUMN "title" varchar(255);

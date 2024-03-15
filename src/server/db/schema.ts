@@ -43,6 +43,30 @@ export const boards = createTable(
   }),
 );
 
+export const suggestions = createTable(
+  "suggestions",
+  {
+    id: serial("id").primaryKey(),
+    boardId: integer("boardId")
+      .notNull()
+      .references(() => boards.id),
+    title: varchar("title", { length: 255 }),
+    content: text("content").notNull(),
+    createdBy: varchar("createdBy", { length: 255 })
+      .notNull()
+      .references(() => users.id),
+    createdAt: timestamp("created_at")
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updatedAt"),
+    upVotes: integer("upVotes").default(0),
+  },
+  (example) => ({
+    boardIdIdx: index("boardId_idx").on(example.boardId),
+    createdByIdx: index("createdBy_idx").on(example.createdBy),
+  }),
+);
+
 export const users = createTable("user", {
   id: varchar("id", { length: 255 }).notNull().primaryKey(),
   name: varchar("name", { length: 255 }),

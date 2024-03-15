@@ -22,7 +22,19 @@ export default async function Home() {
       : undefined;
 
   if (board) {
-    return <PublicBoard board={board} />;
+    const suggestions = await api.suggestions.get.query({
+      boardId: board.id,
+      offset: 0,
+      page: 0,
+    });
+
+    return (
+      <PublicBoard
+        suggestions={suggestions}
+        board={board}
+        isLoggedIn={Boolean(session)}
+      />
+    );
   }
 
   if (isSubdomain) {
