@@ -48,3 +48,11 @@ export function getRelativeTimeString(
 
   return rtf.format(Math.floor(deltaSeconds / divisor), units[unitIndex]!);
 }
+
+export function convertToSlug(text: string) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/ /g, "-")
+    .replace(/[^\w-]+/g, "");
+}

@@ -15,13 +15,22 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { api } from "~/trpc/react";
-import { type SetStateAction, type Dispatch, memo } from "react";
+import { type SetStateAction, type Dispatch, memo, useState } from "react";
 import { type boards } from "~/server/db/schema";
-import { Loader } from "lucide-react";
+import { Check, CircleX, Loader } from "lucide-react";
+import { convertToSlug } from "~/lib/utils";
+import { SITE_URL } from "~/lib/constants";
+
+enum SlugValidationStatus {
+  Idle = "Idle",
+  Validating = "Validating",
+  Valid = "Valid",
+  Invalid = "Invalid",
+}
 
 const formSchema = z.object({
   name: z.string().min(1).max(256),
-  slug: z.string().min(1).max(256),
+  slug: z.string().min(3).max(60),
 });
 
 interface CreateBoardFormProps {
@@ -32,19 +41,59 @@ interface CreateBoardFormProps {
 
 export const CreateBoardForm = memo(
   ({ setUserBoards }: CreateBoardFormProps) => {
+    const [slugValidationStatus, setSlugValidationStatus] = useState(
+      SlugValidationStatus.Idle,
+    );
+
     const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
-      defaultValues: { name: "", slug: "" },
+      defaultValues: {
+        name: "",
+        slug: "",
+      },
     });
-    const handler = api.boards.create.useMutation({
+    const createBoardHandler = api.boards.create.useMutation({
       onSettled: () => {
         form.reset();
       },
     });
+    const validateSlugHandler = api.boards.validateBoardSlug.useMutation();
+
+    const validateSlug = async (value: string) => {
+      setSlugValidationStatus(SlugValidationStatus.Validating);
+      try {
+        const isValid = await validateSlugHandler.mutateAsync({
+          slug: convertToSlug(value),
+        });
+
+        setSlugValidationStatus(
+          isValid ? SlugValidationStatus.Valid : SlugValidationStatus.Invalid,
+        );
+
+        if (isValid) {
+          form.clearErrors("slug");
+        } else {
+          form.setError("slug", {
+            type: "manual",
+            message: "This slug is already taken.",
+          });
+        }
+        return isValid;
+      } catch (error) {
+        setSlugValidationStatus(SlugValidationStatus.Invalid);
+        return false;
+      }
+    };
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
       try {
-        await handler.mutateAsync(values);
+        const isValid = await validateSlug(values.slug);
+
+        if (!isValid) {
+          return;
+        }
+
+        await createBoardHandler.mutateAsync(values);
         setUserBoards((prev) => [
           ...prev,
           {
@@ -54,7 +103,7 @@ export const CreateBoardForm = memo(
             createdAt: new Date(),
             updatedAt: new Date(),
             ownerId: "new-board",
-            slug: values.slug,
+            slug: convertToSlug(values.slug),
           },
         ]);
       } catch (error) {
@@ -88,11 +137,39 @@ export const CreateBoardForm = memo(
               <FormItem>
                 <FormLabel>Slug</FormLabel>
                 <FormControl>
-                  <Input placeholder="best-name-ever" {...field} />
+                  <div className="relative">
+                    <Input
+                      placeholder="best-name-ever"
+                      {...field}
+                      onBlur={async () => {
+                        if (form.formState.errors.slug) {
+                          return;
+                        }
+
+                        await validateSlug(field.value);
+                      }}
+                    />
+
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                      {slugValidationStatus === SlugValidationStatus.Valid ? (
+                        <Check className="h-5 w-5 text-emerald-400" size={16} />
+                      ) : slugValidationStatus ===
+                        SlugValidationStatus.Invalid ? (
+                        <CircleX className="h-5 w-5 text-red-400" size={16} />
+                      ) : slugValidationStatus ===
+                        SlugValidationStatus.Validating ? (
+                        <Loader className="animate-spin" size={16} />
+                      ) : null}
+                    </div>
+                  </div>
                 </FormControl>
                 <FormDescription>
                   Slug is used in URLs and must be unique. Your board will be
-                  available at <code>{`${field.value}`}.goog.info</code>.
+                  available at{" "}
+                  <code>
+                    {`${convertToSlug(field.value)}`}.
+                    {`${SITE_URL.replace("https://", "")}`}
+                  </code>
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -101,7 +178,7 @@ export const CreateBoardForm = memo(
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? (
               <>
-                <Loader className="animate-spin" size={16} />
+                <Loader className="mr-2 animate-spin" size={16} />
                 Creating...
               </>
             ) : (

@@ -47,7 +47,7 @@ export const boardsRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string().min(1).max(256),
-        slug: z.string().min(1).max(256),
+        slug: z.string().min(3).max(60),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -80,5 +80,20 @@ export const boardsRouter = createTRPCRouter({
       }
 
       await Promise.all(promises);
+    }),
+  validateBoardSlug: protectedProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const boardWithTheSameSlug = await ctx.db.query.boards.findFirst({
+        where(fields, operators) {
+          return operators.eq(fields.slug, input.slug);
+        },
+      });
+
+      return !boardWithTheSameSlug;
     }),
 });
