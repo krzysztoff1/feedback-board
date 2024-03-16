@@ -6,13 +6,13 @@ import { memo, useState } from "react";
 import { Loader } from "lucide-react";
 
 interface AuthFormProps {
-  providers: Awaited<ReturnType<typeof getProviders>>;
-  signInCallbackSearchParams: Record<string, string>;
+  readonly providers: Awaited<ReturnType<typeof getProviders>>;
+  readonly signInCallbackSearchParams?: Record<string, string>;
 }
 
 export const AuthForm = memo(
   ({ providers, signInCallbackSearchParams }: AuthFormProps) => {
-    const [currentlSignedIn, setCurrentlSignedIn] = useState<string | null>(
+    const [currentlySigningIn, setCurrentlySigningIn] = useState<string | null>(
       null,
     );
 
@@ -22,25 +22,28 @@ export const AuthForm = memo(
           <Button
             key={provider.id}
             onClick={async () => {
-              setCurrentlSignedIn(provider.id);
+              setCurrentlySigningIn(provider.id);
 
               const pageSearchParams = new URLSearchParams(
                 window.location.search,
               );
               const params = new URLSearchParams(signInCallbackSearchParams);
-              params.append(
-                "targetHostName",
-                pageSearchParams.get("targetHostName")!,
-              );
+
+              if (pageSearchParams.get("targetHostName")) {
+                params.append(
+                  "targetHostName",
+                  pageSearchParams.get("targetHostName")!,
+                );
+              }
 
               await signIn(provider.id, {
                 callbackUrl: `/dashboard?${params.toString()}`,
               });
             }}
             variant={"default"}
-            disabled={currentlSignedIn !== null}
+            disabled={currentlySigningIn !== null}
           >
-            {currentlSignedIn === provider.id ? (
+            {currentlySigningIn === provider.id ? (
               <>
                 <Loader className="mr-2 h-5 w-5 animate-spin" />
                 Signing in...

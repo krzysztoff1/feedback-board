@@ -13,6 +13,7 @@ export default async function View({ params }: { params: { slug: string } }) {
   if (!board) {
     redirect(SITE_URL);
   }
+
   const suggestions = await api.suggestions.get.query({
     boardId: board?.id,
     offset: 0,
