@@ -2,16 +2,17 @@
 
 import { memo } from "react";
 import { CreateSuggestionForm } from "~/app/_components/dashboard/create-suggestion-form";
-import { type boards, type suggestions } from "~/server/db/schema";
+import { type boards } from "~/server/db/schema";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { getRelativeTimeString } from "~/lib/utils";
 import { SITE_URL } from "~/lib/constants";
 import Link from "next/link";
+import { type RouterOutput } from "~/server/api/root";
 
 interface PublicBoardProps {
   readonly board: typeof boards.$inferSelect;
-  readonly suggestions: (typeof suggestions.$inferSelect)[];
+  readonly suggestions: RouterOutput["suggestions"]["get"];
   readonly isLoggedIn: boolean;
 }
 
@@ -47,13 +48,21 @@ export const PublicBoard = memo(
 
         <ul className="flex w-full flex-col">
           {suggestions.map((suggestion) => (
-            <li key={suggestion.id} className="border-b p-4 last:border-b-0">
-              <strong className="text-lg">{suggestion.title}</strong>
-              <p>{suggestion.content}</p>
+            <li
+              key={suggestion.suggestions.id}
+              className="border-b p-4 last:border-b-0"
+            >
+              <strong className="text-lg">
+                {suggestion.suggestions.title}
+              </strong>
+              <p>{suggestion.suggestions.content}</p>
               <div className="flex items-center justify-between gap-2">
                 <time className="block text-sm">
-                  {getRelativeTimeString(suggestion.createdAt)}
+                  {getRelativeTimeString(suggestion.suggestions.createdAt)}
                 </time>
+                <span className="text-sm">
+                  {suggestion.user?.name ?? "Anonymous"}
+                </span>
               </div>
             </li>
           ))}

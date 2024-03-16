@@ -1,11 +1,11 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import {
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { suggestions } from "~/server/db/schema";
+import { suggestions, users } from "~/server/db/schema";
 
 export const suggestionsRouter = createTRPCRouter({
   get: publicProcedure
@@ -22,7 +22,8 @@ export const suggestionsRouter = createTRPCRouter({
       return await ctx.db
         .select()
         .from(suggestions)
-        .orderBy(suggestions.createdAt)
+        .leftJoin(users, eq(suggestions.createdBy, users.id))
+        .orderBy(desc(suggestions.createdAt))
         .where(eq(suggestions.boardId, input.boardId))
         .limit(PAGE_SIZE)
         .offset(input.page * PAGE_SIZE);
