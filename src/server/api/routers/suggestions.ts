@@ -33,6 +33,7 @@ export const suggestionsRouter = createTRPCRouter({
       z.object({
         boardId: z.number(),
         content: z.string(),
+        title: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -41,6 +42,7 @@ export const suggestionsRouter = createTRPCRouter({
       await ctx.db.insert(suggestions).values({
         boardId: input.boardId,
         content: input.content,
+        title: input.title,
         createdBy: uid,
       });
     }),
