@@ -1,13 +1,11 @@
-import { SkeletonCard } from "../_components/dashboard/skeleton-card";
+import { Skeleton } from "~/components/ui/skeleton";
 
 export default async function Loading() {
   return (
     <>
-      <div className="mb-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <SkeletonCard />
-        <SkeletonCard />
-        <SkeletonCard />
-        <SkeletonCard />
+      <div className="max-w-xl">
+        <Skeleton className="mb-8 h-12" />
+        <Skeleton className="h-24" />
       </div>
     </>
   );

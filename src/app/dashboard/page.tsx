@@ -49,8 +49,11 @@ export default async function Dashboard({
   const userBoards = await api.boards.getAll.query();
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-8">
-      <Boards userBoards={userBoards} />
-    </div>
+    <>
+      <h1 className="mb-8 text-2xl font-bold">Dashboard</h1>
+      <div className="flex flex-col gap-4 sm:gap-8">
+        <Boards userBoards={userBoards} />
+      </div>
+    </>
   );
 }

@@ -19,7 +19,8 @@ interface PublicBoardProps {
 export const PublicBoard = memo(
   ({ board, suggestions, isLoggedIn }: PublicBoardProps) => {
     const signInRedirectSearchParams = new URLSearchParams({
-      targetHostName: window.location.hostname,
+      targetHostName:
+        typeof window === "undefined" ? "" : window.location.hostname,
     });
 
     return (
@@ -46,7 +47,7 @@ export const PublicBoard = memo(
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 142.1 76.2% 36.3%;
-    --radius: 0.5rem;
+    --radius: 1rem;
   }
 
   .dark {
@@ -72,8 +73,8 @@ export const PublicBoard = memo(
   }
 `}
         </style>
-        <main className="rounded-radius mx-auto my-8 flex h-full max-w-[600px] flex-col items-center justify-center border border-transparent bg-card p-4 text-card-foreground shadow-input dark:border-border dark:bg-card dark:shadow-none sm:my-16">
-          <header className="flex w-full items-center justify-between p-4">
+        <main className="mx-auto flex h-full max-w-[600px] flex-col items-center justify-center border border-transparent bg-card p-4 text-card-foreground shadow-input dark:border-border dark:bg-card dark:shadow-none sm:my-8 sm:rounded-lg md:my-16">
+          <header className="flex w-full flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center">
             <h1 className="text-2xl font-bold">{board.name}</h1>
             <div className="flex space-x-4">
               {isLoggedIn ? (
