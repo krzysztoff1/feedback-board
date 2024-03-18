@@ -1,12 +1,7 @@
 import { and, eq, count, desc } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import {
-  boards,
-  suggestions,
-  suggestionsUpVotes,
-  users,
-} from "~/server/db/schema";
+import { suggestions, suggestionsUpVotes, users } from "~/server/db/schema";
 
 export const suggestionsRouter = createTRPCRouter({
   create: protectedProcedure

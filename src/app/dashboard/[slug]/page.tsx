@@ -44,6 +44,17 @@ export default async function BoardPage({ params }: BoardPageProps) {
       <div className="flex flex-col gap-4">
         <ul className="flex flex-col gap-2">
           <li className="align-center flex">
+            <span>Your board URL: </span>
+            <Link
+              href={`https://${board.slug}.${SITE_URL.replace("https://", "")}`}
+            >
+              <strong className="ml-2">
+                {`${board.slug}.${SITE_URL.replace("https://", "")}`}
+              </strong>
+            </Link>
+          </li>
+
+          <li className="align-center flex">
             <span>Total suggestions: </span>
             <strong className="ml-2">{stats?.totalSuggestions}</strong>
           </li>
