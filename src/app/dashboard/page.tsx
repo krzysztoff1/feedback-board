@@ -1,7 +1,7 @@
 import { api } from "~/trpc/server";
 import { getServerAuthSession } from "~/server/auth";
 import { redirect } from "next/navigation";
-import { Boards } from "../_components/dashboard/boards";
+import { Boards } from "../../components/dashboard/boards";
 import { SITE_URL } from "~/lib/constants";
 
 interface DashboardProps {

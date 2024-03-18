@@ -1,5 +1,5 @@
-import { Nav } from "../_components/dashboard/nav";
-import { TopBar } from "../_components/top-bar";
+import { Nav } from "../../components/dashboard/nav";
+import { TopBar } from "../../components/dashboard/top-bar";
 
 interface DashboardLayoutProps {
   readonly children: React.ReactNode;

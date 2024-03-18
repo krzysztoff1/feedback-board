@@ -4,9 +4,9 @@ import { redirect } from "next/navigation";
 import { api } from "~/trpc/server";
 import { PublicBoard } from "~/components/public-board/public-board";
 import { SITE_URL } from "~/lib/constants";
-import { Hero } from "./landing/hero";
-import { Features } from "./landing/bento";
-import { Footer } from "./landing/footer";
+import { Hero } from "../components/landing/hero";
+import { Features } from "../components/landing/bento";
+import { Footer } from "../components/landing/footer";
 
 export default async function Home() {
   noStore();

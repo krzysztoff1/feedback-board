@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { BoardCustomizer } from "~/app/_components/dashboard/board-customizer";
+import { BoardCustomizer } from "~/components/dashboard/board-customizer";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
 

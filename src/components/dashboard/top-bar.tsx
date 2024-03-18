@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { SignOutButton } from "./auth/sign-out-button";
+import { SignOutButton } from "../auth/sign-out-button";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { BoardSwitcher } from "./dashboard/board-switcher";
+import { BoardSwitcher } from "./board-switcher";
 
 export const TopBar = memo(() => {
   const session = useSession();

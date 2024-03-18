@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { SuggestionCard } from "~/app/_components/dashboard/suggestion-card";
+import { SuggestionCard } from "~/components/dashboard/suggestion-card";
 import { Button } from "~/components/ui/button";
 import { SITE_URL } from "~/lib/constants";
 import { getServerAuthSession } from "~/server/auth";

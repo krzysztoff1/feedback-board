@@ -1,7 +1,7 @@
 import { getServerAuthSession } from "~/server/auth";
 import { getProviders } from "next-auth/react";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
-import { AuthForm } from "~/app/_components/auth/auth-form";
+import { AuthForm } from "~/components/auth/auth-form";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { SITE_URL } from "~/lib/constants";

@@ -2,7 +2,7 @@
 
 import { type RouterOutput } from "~/server/api/root";
 import { memo } from "react";
-import { CreateSuggestionForm } from "~/app/_components/dashboard/create-suggestion-form";
+import { CreateSuggestionForm } from "~/components/dashboard/create-suggestion-form";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn, getRelativeTimeString, throttle } from "~/lib/utils";

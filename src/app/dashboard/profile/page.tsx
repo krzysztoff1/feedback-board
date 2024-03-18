@@ -1,4 +1,4 @@
-import { EditNameForm } from "~/app/_components/dashboard/edit-name-form";
+import { EditNameForm } from "~/components/dashboard/edit-name-form";
 import { getServerAuthSession } from "~/server/auth";
 
 export default async function Profile() {
