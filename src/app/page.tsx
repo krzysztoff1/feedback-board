@@ -40,7 +40,7 @@ export default async function Home() {
     );
   }
 
-  if (isSubdomain) {
+  if (isSubdomain && process.env.VERCEL_ENV === "production") {
     redirect(SITE_URL);
   }
 
