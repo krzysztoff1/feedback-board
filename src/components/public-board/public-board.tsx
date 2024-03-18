@@ -1,7 +1,6 @@
 "use client";
 
 import { type RouterOutput } from "~/server/api/root";
-import { type boards } from "~/server/db/schema";
 import { memo } from "react";
 import { CreateSuggestionForm } from "~/app/_components/dashboard/create-suggestion-form";
 import { Button } from "../ui/button";

@@ -57,12 +57,12 @@ export function convertToSlug(text: string) {
     .replace(/[^\w-]+/g, "");
 }
 
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   fn: T,
   wait: number,
 ): T {
   let time = Date.now();
-  return function (this: any, ...args: any[]) {
+  return function (this: unknown, ...args: unknown[]) {
     if (time + wait - Date.now() < 0) {
       fn.apply(this, args);
       time = Date.now();
