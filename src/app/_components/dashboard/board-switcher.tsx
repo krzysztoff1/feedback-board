@@ -3,22 +3,18 @@
 import { Slash } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { memo, use, useState } from "react";
+import { memo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
-import type { RouterOutputs } from "~/trpc/shared";
+import { api } from "~/trpc/react";
 
-interface BoardSwitcherProps {
-  readonly boardsPromise: Promise<RouterOutputs["boards"]["getAll"]>;
-}
-
-export const BoardSwitcher = memo(({ boardsPromise }: BoardSwitcherProps) => {
+export const BoardSwitcher = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
-  const boards = use(boardsPromise);
+  const boards = api.boards.getAll.useQuery().data ?? [];
   const params = useParams();
   const board = boards.find((board) => board.slug === params.slug);
 

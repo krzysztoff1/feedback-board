@@ -1,15 +1,14 @@
-import { api } from "~/trpc/server";
 import { Nav } from "../_components/dashboard/nav";
 import { TopBar } from "../_components/top-bar";
 
-interface RootLayoutProps {
+interface DashboardLayoutProps {
   readonly children: React.ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen">
-      <TopBar boardsPromise={api.boards.getAll.query()} />
+      <TopBar />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Nav />

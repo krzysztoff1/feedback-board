@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, memo } from "react";
+import { memo } from "react";
 import { SignOutButton } from "./auth/sign-out-button";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -13,13 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { BoardSwitcher } from "./dashboard/board-switcher";
-import type { RouterOutputs } from "~/trpc/shared";
 
-interface TopBarProps {
-  readonly boardsPromise: Promise<RouterOutputs["boards"]["getAll"]>;
-}
-
-export const TopBar = memo(({ boardsPromise }: TopBarProps) => {
+export const TopBar = memo(() => {
   const session = useSession();
 
   return (
@@ -31,9 +26,7 @@ export const TopBar = memo(({ boardsPromise }: TopBarProps) => {
               Feedback Board
             </span>
           </Link>
-          <Suspense fallback={null}>
-            <BoardSwitcher boardsPromise={boardsPromise} />
-          </Suspense>
+          <BoardSwitcher />
         </div>
         <div className="flex items-center space-x-4">
           <DropdownMenu>
