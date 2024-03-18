@@ -111,32 +111,32 @@ export const PublicBoard = memo(
                         return;
                       }
 
-                      document
-                        .querySelector(
-                          `#suggestion-${suggestion.id} .upvote-icon`,
-                        )
-                        ?.classList.toggle("text-primary");
-
+                      const wrapperSelector = `#suggestion-${suggestion.id}`;
+                      const icon = document.querySelector(
+                        `${wrapperSelector} .upvote-icon`,
+                      );
                       const counter = document.querySelector(
-                        `#suggestion-${suggestion.id} .upvote-counter`,
+                        `${wrapperSelector} .upvote-counter`,
                       );
 
-                      if (counter) {
-                        counter.textContent = suggestion.isUpVoted
-                          ? `${Number(counter.textContent) - 1}`
-                          : `${Number(counter.textContent) + 1}`;
+                      if (icon && counter) {
+                        if (suggestion.isUpVoted) {
+                          icon.classList.remove("text-primary");
+                          counter.textContent = `${(Number(counter.textContent) ?? 0) - 1}`;
+                        } else {
+                          icon.classList.add("text-primary");
+                          counter.textContent = `${(Number(counter.textContent) ?? 0) + 1}`;
+                        }
                       }
 
                       suggestion.isUpVoted = !suggestion.isUpVoted;
 
-                      const newState = await upVoteHandler.mutateAsync({
+                      await upVoteHandler.mutateAsync({
                         boardId: board.id,
                         suggestionId: suggestion.id,
                       });
-
-                      suggestion.isUpVoted = newState;
                     }, 250)}
-                    className="flex flex-col items-center justify-center gap-2 pb-4 pr-4 pt-4"
+                    className="flex flex-col items-center justify-center gap-1 pb-4 pr-4 pt-4"
                   >
                     <ArrowBigUp
                       size={24}
