@@ -16,7 +16,11 @@ export default async function Home() {
   const isSubdomain = hostName.split(".").length > 2;
   const firstPartOfHostName = hostName.split(".")[0];
 
-  if (firstPartOfHostName && isSubdomain) {
+  if (
+    firstPartOfHostName &&
+    isSubdomain &&
+    process.env.VERCEL_ENV === "production"
+  ) {
     const boardData = await api.boards.getPublicBoardData.query({
       slug: firstPartOfHostName,
       page: 0,
