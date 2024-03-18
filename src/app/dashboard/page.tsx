@@ -25,7 +25,7 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
     const redirectUrl =
       process.env.NODE_ENV === "production"
         ? prodReturnUrl.href
-        : `/view/${returnToBoard}`;
+        : `/dashboard/${returnToBoard}/view`;
 
     redirect(redirectUrl);
   }

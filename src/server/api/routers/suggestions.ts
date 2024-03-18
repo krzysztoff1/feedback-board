@@ -1,7 +1,12 @@
-import { and, eq, count } from "drizzle-orm";
+import { and, eq, count, desc } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { suggestions, suggestionsUpVotes } from "~/server/db/schema";
+import {
+  boards,
+  suggestions,
+  suggestionsUpVotes,
+  users,
+} from "~/server/db/schema";
 
 export const suggestionsRouter = createTRPCRouter({
   create: protectedProcedure
@@ -41,6 +46,43 @@ export const suggestionsRouter = createTRPCRouter({
           );
         },
       });
+    }),
+  getAll: protectedProcedure
+    .input(z.object({ slug: z.string(), page: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const PAGE_SIZE = 20;
+      const uid = ctx.session.user.id;
+      const board = await ctx.db.query.boards.findFirst({
+        where(fields) {
+          return eq(fields.slug, input.slug);
+        },
+      });
+      const boardId = board?.id ?? -1;
+
+      if (!board || board.createdById !== uid) {
+        return [];
+      }
+
+      const res = await ctx.db
+        .select()
+        .from(suggestions)
+        .leftJoin(users, eq(suggestions.createdBy, users.id))
+        .orderBy(desc(suggestions.createdAt))
+        .where(eq(suggestions.boardId, boardId))
+        .limit(PAGE_SIZE)
+        .offset(input.page * PAGE_SIZE);
+
+      return res.map(({ suggestions, user }) => ({
+        id: suggestions.id,
+        title: suggestions.title,
+        content: suggestions.content,
+        upVotes: suggestions.upVotes,
+        user: {
+          id: user?.id,
+          name: user?.name,
+          image: user?.image,
+        },
+      }));
     }),
   toggleUpVote: protectedProcedure
     .input(
@@ -100,5 +142,36 @@ export const suggestionsRouter = createTRPCRouter({
         );
 
       return !isAlreadyUpVoted;
+    }),
+  getStats: protectedProcedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const uid = ctx.session.user.id;
+      const board = await ctx.db.query.boards.findFirst({
+        where(fields) {
+          return eq(fields.slug, input.slug);
+        },
+      });
+      const boardId = board?.id ?? -1;
+
+      const [totalSuggestions, totalUpvotes] = await Promise.all([
+        ctx.db
+          .select({ _count: count(suggestions.id) })
+          .from(suggestions)
+          .where(eq(suggestions.boardId, boardId)),
+        ctx.db
+          .select({ _count: count(suggestionsUpVotes.id) })
+          .from(suggestionsUpVotes)
+          .where(eq(suggestionsUpVotes.boardId, boardId)),
+      ]);
+
+      if (!board || board.createdById !== uid) {
+        return null;
+      }
+
+      return {
+        totalSuggestions: totalSuggestions[0]?._count,
+        totalUpvotes: totalUpvotes[0]?._count,
+      };
     }),
 });

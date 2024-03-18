@@ -1,43 +1,18 @@
-"use client";
-
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  navigationMenuTriggerStyle,
-} from "~/components/ui/navigation-menu";
+import { api } from "~/trpc/server";
+import { Nav } from "../_components/dashboard/nav";
 import { TopBar } from "../_components/top-bar";
-import Link from "next/link";
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+interface RootLayoutProps {
+  readonly children: React.ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <div className="min-h-screen">
-      <TopBar />
+      <TopBar boardsPromise={api.boards.getAll.query()} />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <NavigationMenu className="mb-8">
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <Link href="/dashboard" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Dashboard
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link href="/dashboard/profile" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Profile
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+        <Nav />
         {children}
       </main>
     </div>

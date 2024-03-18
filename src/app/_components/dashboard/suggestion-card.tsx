@@ -11,7 +11,7 @@ import { memo } from "react";
 import { type RouterOutput } from "~/server/api/root";
 
 interface SuggestionCardProps {
-  readonly suggestion: RouterOutput["boards"]["getPublicBoardData"]["suggestions"][number];
+  readonly suggestion: RouterOutput["suggestions"]["getAll"][number];
 }
 
 export const SuggestionCard = memo(({ suggestion }: SuggestionCardProps) => {

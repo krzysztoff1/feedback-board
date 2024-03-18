@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { BoardCustomizer } from "~/app/_components/dashboard/board-customizer";
+import { SuggestionCard } from "~/app/_components/dashboard/suggestion-card";
 import { Button } from "~/components/ui/button";
 import { SITE_URL } from "~/lib/constants";
 import { getServerAuthSession } from "~/server/auth";
@@ -13,9 +13,11 @@ interface BoardPageProps {
 }
 
 export default async function BoardPage({ params }: BoardPageProps) {
-  const [session, board] = await Promise.all([
+  const [session, board, stats, suggestions] = await Promise.all([
     getServerAuthSession(),
     api.boards.get.query({ slug: params.slug }),
+    api.suggestions.getStats.query({ slug: params.slug }),
+    api.suggestions.getAll.query({ slug: params.slug, page: 0 }),
   ]);
 
   if (!board || !session || board.createdById !== session?.user.id) {
@@ -24,31 +26,39 @@ export default async function BoardPage({ params }: BoardPageProps) {
 
   return (
     <div>
-      <span className="mb-8 flex items-center justify-between">
+      <header className="mb-8 flex items-center justify-between">
         <h1 className="block text-2xl font-bold">{board.name}</h1>
 
         <Link
           href={
             process.env.VERCEL_ENV === "production"
               ? `https://${board.slug}.${SITE_URL.replace("https://", "")}`
-              : `/view/${board.slug}`
+              : `/dashboard/${board.slug}/view`
           }
           className="block"
         >
           <Button variant={"outline"}>View live</Button>
         </Link>
-      </span>
+      </header>
 
-      <BoardCustomizer theme={board.theme} board={board} />
+      <div className="flex flex-col gap-4">
+        <ul className="flex flex-col gap-2">
+          <li className="align-center flex">
+            <span>Total suggestions: </span>
+            <strong className="ml-2">{stats?.totalSuggestions}</strong>
+          </li>
+          <li className="align-center flex">
+            <span>Total upvotes: </span>
+            <strong className="ml-2">{stats?.totalUpvotes}</strong>
+          </li>
+        </ul>
+      </div>
 
-      {/* <ul className="mt-4 flex flex-col gap-4">
+      <ul className="mt-4 flex flex-col gap-4">
         {suggestions.map((suggestion) => (
-          <SuggestionCard
-            key={suggestion.suggestions.id}
-            suggestion={suggestion}
-          />
+          <SuggestionCard key={suggestion.id} suggestion={suggestion} />
         ))}
-      </ul> */}
+      </ul>
     </div>
   );
 }
