@@ -30,9 +30,9 @@ export default function RootLayout({
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="/dashboard/settings" legacyBehavior passHref>
+              <Link href="/dashboard/profile" legacyBehavior passHref>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Settings
+                  Profile
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
