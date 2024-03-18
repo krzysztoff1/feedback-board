@@ -43,7 +43,12 @@ export const BoardCustomizer = memo(({ theme, board }: SelectThemeProps) => {
     defaultValues: { name: theme?.name ?? boardThemes.at(0)!.name },
   });
 
-  const createBoardHandler = api.boards.setTheme.useMutation();
+  const utils = api.useUtils();
+  const createBoardHandler = api.boards.setTheme.useMutation({
+    onSettled: async () => {
+      await utils.boards.get.invalidate();
+    },
+  });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
