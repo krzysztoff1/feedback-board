@@ -42,7 +42,7 @@ export const PublicBoard = memo(
 
         <main
           className={cn(
-            "board-main mx-auto flex h-full max-w-[600px] flex-col items-center justify-center border border-transparent bg-card p-4 text-card-foreground shadow-input dark:border-border dark:bg-card dark:shadow-none sm:rounded-lg",
+            "board-main mx-auto flex h-full max-w-[600px] flex-col items-center justify-center border border-border bg-card p-4 text-card-foreground shadow-input dark:bg-card dark:shadow-none sm:rounded-lg",
             { "sm:my-8 md:my-16": !isPreview },
           )}
         >
@@ -69,15 +69,17 @@ export const PublicBoard = memo(
                 </Link>
               )}
 
-              <Avatar className="h-8 w-8">
-                <AvatarImage
-                  src={session.data?.user?.image ?? ""}
-                  alt="Profile picture"
-                />
-                <AvatarFallback>
-                  {session.data?.user?.name?.[0]?.toUpperCase() ?? "U"}
-                </AvatarFallback>
-              </Avatar>
+              {session.status === "authenticated" ? (
+                <Avatar className="h-8 w-8">
+                  <AvatarImage
+                    src={session.data?.user?.image ?? ""}
+                    alt="Profile picture"
+                  />
+                  <AvatarFallback>
+                    {session.data?.user?.name?.[0]?.toUpperCase() ?? "U"}
+                  </AvatarFallback>
+                </Avatar>
+              ) : null}
             </div>
           </header>
 
