@@ -161,7 +161,7 @@ export const PublicBoard = memo(
                     </p>
                     <div className="flex items-center justify-between gap-2">
                       <time className="block text-sm">
-                        {getRelativeTimeString(suggestion.createdAt)}
+                        {getRelativeTimeString(suggestion.createdAt, "en-US")}
                       </time>
                       <span className="text-sm">
                         {suggestion.user?.name ?? "Anonymous"}
