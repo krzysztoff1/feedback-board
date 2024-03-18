@@ -45,7 +45,6 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
   const session = await getServerAuthSession();
 
   if (!session) {
-    console.log("redirecting to /auth/signin");
     redirect("/auth/signin");
   }
 
