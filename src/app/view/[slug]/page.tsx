@@ -14,17 +14,16 @@ export default async function View({ params }: { params: { slug: string } }) {
     redirect(SITE_URL);
   }
 
-  const suggestions = await api.suggestions.get.query({
+  const boardData = await api.suggestions.get.query({
     boardId: board?.id,
-    offset: 0,
     page: 0,
   });
 
   return (
     <PublicBoard
       isLoggedIn={Boolean(session)}
-      board={board}
-      suggestions={suggestions}
+      board={boardData.board}
+      suggestions={boardData.suggestions}
       themeCSS={board?.themeCSS ?? ""}
       isPreview={false}
     />

@@ -6,15 +6,17 @@ import { memo } from "react";
 import { CreateSuggestionForm } from "~/app/_components/dashboard/create-suggestion-form";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { cn, getRelativeTimeString } from "~/lib/utils";
+import { cn, getRelativeTimeString, throttle } from "~/lib/utils";
 import { SITE_URL } from "~/lib/constants";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { ArrowBigUp } from "lucide-react";
+import { api } from "~/trpc/react";
 
 interface PublicBoardProps {
-  readonly board: typeof boards.$inferSelect;
-  readonly suggestions: RouterOutput["suggestions"]["get"];
+  readonly board: RouterOutput["suggestions"]["get"]["board"];
+  readonly suggestions: RouterOutput["suggestions"]["get"]["suggestions"];
   readonly isLoggedIn: boolean;
   readonly isPreview: boolean;
   readonly themeCSS?: string;
@@ -33,6 +35,12 @@ export const PublicBoard = memo(
       targetHostName:
         typeof window === "undefined" ? "" : window.location.hostname,
     });
+
+    const upVoteHandler = api.suggestions.toggleUpVote.useMutation();
+
+    if (!board) {
+      return null;
+    }
 
     return (
       <>
@@ -94,24 +102,72 @@ export const PublicBoard = memo(
             <ul className="flex w-full flex-col">
               {suggestions.map((suggestion) => (
                 <li
-                  key={suggestion.suggestions.id}
-                  className="border-b p-4 last:border-b-0"
+                  key={suggestion.id}
+                  id={`suggestion-${suggestion.id}`}
+                  className="flex border-b last:border-b-0"
                 >
-                  <strong className="text-lg text-primary">
-                    {suggestion.suggestions.title}
-                  </strong>
-                  <p>
-                    {suggestion.suggestions.content.length > 100
-                      ? `${suggestion.suggestions.content.slice(0, 100)}...`
-                      : suggestion.suggestions.content}
-                  </p>
-                  <div className="flex items-center justify-between gap-2">
-                    <time className="block text-sm">
-                      {getRelativeTimeString(suggestion.suggestions.createdAt)}
-                    </time>
-                    <span className="text-sm">
-                      {suggestion.user?.name ?? "Anonymous"}
+                  <button
+                    onClick={throttle(async () => {
+                      if (!session) {
+                        return;
+                      }
+
+                      document
+                        .querySelector(
+                          `#suggestion-${suggestion.id} .upvote-icon`,
+                        )
+                        ?.classList.toggle("text-primary");
+
+                      const counter = document.querySelector(
+                        `#suggestion-${suggestion.id} .upvote-counter`,
+                      );
+
+                      if (counter) {
+                        counter.textContent = suggestion.isUpVoted
+                          ? `${Number(counter.textContent) - 1}`
+                          : `${Number(counter.textContent) + 1}`;
+                      }
+
+                      suggestion.isUpVoted = !suggestion.isUpVoted;
+
+                      const newState = await upVoteHandler.mutateAsync({
+                        boardId: board.id,
+                        suggestionId: suggestion.id,
+                      });
+
+                      suggestion.isUpVoted = newState;
+                    }, 250)}
+                    className="flex flex-col items-center justify-center gap-2 pb-4 pr-4 pt-4"
+                  >
+                    <ArrowBigUp
+                      size={24}
+                      className={cn(
+                        "upvote-icon transition-transform hover:scale-105",
+                        { "text-primary": suggestion.isUpVoted },
+                      )}
+                      fill={suggestion.isUpVoted ? "currentColor" : undefined}
+                    />
+                    <span className="upvote-counter block">
+                      {suggestion.upVotes}
                     </span>
+                  </button>
+                  <div className="flex w-full flex-col pb-4 pr-4 pt-4">
+                    <strong className="text-lg text-primary">
+                      {suggestion.title}
+                    </strong>
+                    <p>
+                      {suggestion.content.length > 100
+                        ? `${suggestion.content.slice(0, 100)}...`
+                        : suggestion.content}
+                    </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <time className="block text-sm">
+                        {getRelativeTimeString(suggestion.createdAt)}
+                      </time>
+                      <span className="text-sm">
+                        {suggestion.user?.name ?? "Anonymous"}
+                      </span>
+                    </div>
                   </div>
                 </li>
               ))}

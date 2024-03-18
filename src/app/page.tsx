@@ -23,16 +23,15 @@ export default async function Home() {
       : undefined;
 
   if (board) {
-    const suggestions = await api.suggestions.get.query({
+    const boardData = await api.suggestions.get.query({
       boardId: board.id,
-      offset: 0,
       page: 0,
     });
 
     return (
       <PublicBoard
-        suggestions={suggestions}
-        board={board}
+        suggestions={boardData.suggestions}
+        board={boardData.board}
         isLoggedIn={Boolean(session)}
         isPreview={false}
         themeCSS={board.themeCSS ?? ""}
