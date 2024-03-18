@@ -9,6 +9,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn, getRelativeTimeString } from "~/lib/utils";
 import { SITE_URL } from "~/lib/constants";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface PublicBoardProps {
   readonly board: typeof boards.$inferSelect;
@@ -26,6 +28,7 @@ export const PublicBoard = memo(
     isPreview,
     themeCSS = "",
   }: PublicBoardProps) => {
+    const session = useSession();
     const signInRedirectSearchParams = new URLSearchParams({
       targetHostName:
         typeof window === "undefined" ? "" : window.location.hostname,
@@ -45,7 +48,7 @@ export const PublicBoard = memo(
         >
           <header className="flex w-full flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center">
             <h1 className="text-2xl font-bold">{board.name}</h1>
-            <div className="flex space-x-4">
+            <div className="flex items-center gap-4">
               {isLoggedIn ? (
                 <Popover>
                   <PopoverTrigger
@@ -65,6 +68,16 @@ export const PublicBoard = memo(
                   <Button variant={"default"}>Sign in</Button>
                 </Link>
               )}
+
+              <Avatar className="h-8 w-8">
+                <AvatarImage
+                  src={session.data?.user?.image ?? ""}
+                  alt="Profile picture"
+                />
+                <AvatarFallback>
+                  {session.data?.user?.name?.[0]?.toUpperCase() ?? "U"}
+                </AvatarFallback>
+              </Avatar>
             </div>
           </header>
 

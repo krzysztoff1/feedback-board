@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { Inter } from "next/font/google";
 import { TRPCReactProvider } from "~/trpc/react";
 import { cn } from "~/lib/utils";
+import { NextAuthProvider } from "~/providers/next-auth-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,7 +29,9 @@ export default function RootLayout({
           inter.className,
         )}
       >
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <NextAuthProvider>
+          <TRPCReactProvider>{children}</TRPCReactProvider>
+        </NextAuthProvider>
       </body>
     </html>
   );
