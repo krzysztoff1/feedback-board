@@ -2,6 +2,7 @@ import { api } from "~/trpc/server";
 import { getServerAuthSession } from "~/server/auth";
 import { redirect } from "next/navigation";
 import { Boards } from "../_components/dashboard/boards";
+import { SITE_URL } from "~/lib/constants";
 
 interface DashboardProps {
   readonly searchParams: Record<string, string | string[] | undefined>;
@@ -16,9 +17,10 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
     : "";
 
   if (returnToBoard) {
-    const prodReturnUrl = new URL("/", `https://${returnToBoard}.goog.info`);
-
-    prodReturnUrl.searchParams.set("isRecentlySignedIn", "true");
+    const prodReturnUrl = new URL(
+      "/",
+      `https://${returnToBoard}.${SITE_URL.replace("https://", "")}`,
+    );
 
     const redirectUrl =
       process.env.NODE_ENV === "production"
