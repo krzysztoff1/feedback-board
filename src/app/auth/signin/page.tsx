@@ -13,19 +13,20 @@ import { headers } from "next/headers";
 import { SITE_URL } from "~/lib/constants";
 
 export default async function Page() {
-  const session = await getServerAuthSession();
+  const [session, providers] = await Promise.all([
+    getServerAuthSession(),
+    getProviders(),
+  ]);
 
   if (session) {
     return redirect("/dashboard");
   }
-
-  const providers = await getProviders();
   const headersList = headers();
 
   const hostName = headersList.get("x-hostname") ?? "";
   const isSubdomain = hostName.split(".").length > 2;
 
-  if (isSubdomain) {
+  if (isSubdomain && process.env.VERCEL_ENV === "production") {
     const searchParams = new URLSearchParams();
     searchParams.append("targetHostName", hostName);
     searchParams.append("isSubdomain", String(isSubdomain));

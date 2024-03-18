@@ -104,6 +104,8 @@ export const CreateBoardForm = memo(
             updatedAt: new Date(),
             ownerId: "new-board",
             slug: convertToSlug(values.slug),
+            theme: null,
+            themeCSS: "",
           },
         ]);
       } catch (error) {

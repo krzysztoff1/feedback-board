@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { PublicBoard } from "~/components/public-board/PublicBoard";
+import { PublicBoard } from "~/components/public-board/public-board";
 import { SITE_URL } from "~/lib/constants";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
@@ -25,6 +25,8 @@ export default async function View({ params }: { params: { slug: string } }) {
       isLoggedIn={Boolean(session)}
       board={board}
       suggestions={suggestions}
+      themeCSS={board?.themeCSS ?? ""}
+      isPreview={false}
     />
   );
 }

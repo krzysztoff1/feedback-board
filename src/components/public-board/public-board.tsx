@@ -1,23 +1,34 @@
 "use client";
 
+import { type RouterOutput } from "~/server/api/root";
+import { type boards } from "~/server/db/schema";
 import { memo } from "react";
 import { CreateSuggestionForm } from "~/app/_components/dashboard/create-suggestion-form";
-import { type boards } from "~/server/db/schema";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { getRelativeTimeString } from "~/lib/utils";
+import { cn, getRelativeTimeString } from "~/lib/utils";
 import { SITE_URL } from "~/lib/constants";
 import Link from "next/link";
-import { type RouterOutput } from "~/server/api/root";
+import { useSession } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface PublicBoardProps {
   readonly board: typeof boards.$inferSelect;
   readonly suggestions: RouterOutput["suggestions"]["get"];
   readonly isLoggedIn: boolean;
+  readonly isPreview: boolean;
+  readonly themeCSS?: string;
 }
 
 export const PublicBoard = memo(
-  ({ board, suggestions, isLoggedIn }: PublicBoardProps) => {
+  ({
+    board,
+    suggestions,
+    isLoggedIn,
+    isPreview,
+    themeCSS = "",
+  }: PublicBoardProps) => {
+    const session = useSession();
     const signInRedirectSearchParams = new URLSearchParams({
       targetHostName:
         typeof window === "undefined" ? "" : window.location.hostname,
@@ -25,61 +36,25 @@ export const PublicBoard = memo(
 
     return (
       <>
-        <style>
-          {`
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 142.1 76.2% 36.3%;
-    --primary-foreground: 355.7 100% 97.3%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 142.1 76.2% 36.3%;
-    --radius: 1rem;
-  }
+        {themeCSS ? (
+          <style dangerouslySetInnerHTML={{ __html: themeCSS }} />
+        ) : null}
 
-  .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 0 0% 95%;
-    --card: 24 9.8% 10%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 142.1 70.6% 45.3%;
-    --primary-foreground: 144.9 80.4% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 12 6.5% 15.1%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 142.4 71.8% 29.2%;
-  }
-`}
-        </style>
-        <main className="mx-auto flex h-full max-w-[600px] flex-col items-center justify-center border border-transparent bg-card p-4 text-card-foreground shadow-input dark:border-border dark:bg-card dark:shadow-none sm:my-8 sm:rounded-lg md:my-16">
+        <main
+          className={cn(
+            "board-main mx-auto flex h-full max-w-[600px] flex-col items-center justify-center border border-border bg-card p-4 text-card-foreground shadow-input dark:bg-card dark:shadow-none sm:rounded-lg",
+            { "sm:my-8 md:my-16": !isPreview },
+          )}
+        >
           <header className="flex w-full flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center">
             <h1 className="text-2xl font-bold">{board.name}</h1>
-            <div className="flex space-x-4">
+            <div className="flex items-center gap-4">
               {isLoggedIn ? (
                 <Popover>
-                  <PopoverTrigger asChild>
+                  <PopoverTrigger
+                    style={isPreview ? { pointerEvents: "none" } : {}}
+                    asChild
+                  >
                     <Button variant={"default"}>Create Suggestion</Button>
                   </PopoverTrigger>
                   <PopoverContent>
@@ -93,6 +68,18 @@ export const PublicBoard = memo(
                   <Button variant={"default"}>Sign in</Button>
                 </Link>
               )}
+
+              {session.status === "authenticated" ? (
+                <Avatar className="h-8 w-8">
+                  <AvatarImage
+                    src={session.data?.user?.image ?? ""}
+                    alt="Profile picture"
+                  />
+                  <AvatarFallback>
+                    {session.data?.user?.name?.[0]?.toUpperCase() ?? "U"}
+                  </AvatarFallback>
+                </Avatar>
+              ) : null}
             </div>
           </header>
 

@@ -17,7 +17,7 @@ export const Boards = memo(({ userBoards: _userBoards }: BoardCardProps) => {
   return (
     <div className="flex flex-col gap-4 sm:gap-8">
       {userBoards.length > 0 ? (
-        <div className="flex flex-col gap-4 sm:flex-row">
+        <div className="flex flex-col gap-4">
           {userBoards.map((board) => (
             <BoardCard
               key={board.id}

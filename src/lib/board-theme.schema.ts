@@ -1,0 +1,57 @@
+import { z } from "zod";
+
+export const boardThemeSchema = z.object({
+  name: z.string(),
+  label: z.string(),
+  activeColor: z.object({
+    light: z.string(),
+    dark: z.string(),
+  }),
+  cssVars: z.object({
+    light: z.object({
+      background: z.string(),
+      foreground: z.string(),
+      card: z.string(),
+      "card-foreground": z.string(),
+      popover: z.string(),
+      "popover-foreground": z.string(),
+      primary: z.string(),
+      "primary-foreground": z.string(),
+      secondary: z.string(),
+      "secondary-foreground": z.string(),
+      muted: z.string(),
+      "muted-foreground": z.string(),
+      accent: z.string(),
+      "accent-foreground": z.string(),
+      destructive: z.string(),
+      "destructive-foreground": z.string(),
+      border: z.string(),
+      input: z.string(),
+      ring: z.string(),
+      radius: z.string().optional(),
+    }),
+    dark: z.object({
+      background: z.string(),
+      foreground: z.string(),
+      card: z.string(),
+      "card-foreground": z.string(),
+      popover: z.string(),
+      "popover-foreground": z.string(),
+      primary: z.string(),
+      "primary-foreground": z.string(),
+      secondary: z.string(),
+      "secondary-foreground": z.string(),
+      muted: z.string(),
+      "muted-foreground": z.string(),
+      accent: z.string(),
+      "accent-foreground": z.string(),
+      destructive: z.string(),
+      "destructive-foreground": z.string(),
+      border: z.string(),
+      input: z.string(),
+      ring: z.string(),
+    }),
+  }),
+});
+
+export type BoardTheme = z.infer<typeof boardThemeSchema>;

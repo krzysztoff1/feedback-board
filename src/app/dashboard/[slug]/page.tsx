@@ -1,74 +1,54 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { BoardCustomizer } from "~/app/_components/dashboard/board-customizer";
 import { Button } from "~/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
+import { SITE_URL } from "~/lib/constants";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
 
-export default async function BoardPage({
-  params,
-}: {
-  params: {
-    slug: string;
+interface BoardPageProps {
+  readonly params: {
+    readonly slug: string;
   };
-}) {
-  const session = await getServerAuthSession();
+}
 
-  const board = await api.boards.get.query({
-    slug: params.slug,
-  });
+export default async function BoardPage({ params }: BoardPageProps) {
+  const [session, board] = await Promise.all([
+    getServerAuthSession(),
+    api.boards.get.query({ slug: params.slug }),
+  ]);
 
   if (!board || !session || board.createdById !== session?.user.id) {
     redirect("/dashboard");
   }
 
-  const suggestions = await api.suggestions.get.query({
-    boardId: board?.id,
-    offset: 0,
-    page: 0,
-  });
-
   return (
     <div>
-      <h1 className="mb-8 text-2xl font-bold">{board.name}</h1>
+      <span className="mb-8 flex items-center justify-between">
+        <h1 className="block text-2xl font-bold">{board.name}</h1>
 
-      <Link
-        href={
-          process.env.NODE_ENV === "production"
-            ? `https://${board.slug}.goog.info`
-            : `/view/${board.slug}`
-        }
-      >
-        <Button variant={"link"}>View live</Button>
-      </Link>
+        <Link
+          href={
+            process.env.VERCEL_ENV === "production"
+              ? `https://${board.slug}.${SITE_URL.replace("https://", "")}`
+              : `/view/${board.slug}`
+          }
+          className="block"
+        >
+          <Button variant={"outline"}>View live</Button>
+        </Link>
+      </span>
 
-      <ul className="mt-4 flex flex-col gap-4">
-        {suggestions.map(({ suggestions: suggestion, user }) => (
-          <Card key={suggestion.id}>
-            <CardHeader>
-              <CardTitle>{suggestion.title}</CardTitle>
-              <CardDescription>
-                <p>{user?.name}</p>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>{suggestion.content}</p>
-            </CardContent>
-            <CardFooter>
-              <p className="text-sm text-muted-foreground">
-                Created at {new Date(suggestion.createdAt).toLocaleString()}
-              </p>
-            </CardFooter>
-          </Card>
+      <BoardCustomizer theme={board.theme} board={board} />
+
+      {/* <ul className="mt-4 flex flex-col gap-4">
+        {suggestions.map((suggestion) => (
+          <SuggestionCard
+            key={suggestion.suggestions.id}
+            suggestion={suggestion}
+          />
         ))}
-      </ul>
+      </ul> */}
     </div>
   );
 }
