@@ -42,14 +42,13 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
     redirect(redirectUrl.href);
   }
 
-  const [session, userBoards] = await Promise.all([
-    getServerAuthSession(),
-    api.boards.getAll.query(),
-  ]);
+  const session = await getServerAuthSession();
 
   if (!session?.user) {
     redirect("/auth/signin");
   }
+
+  const userBoards = await api.boards.getAll.query();
 
   return (
     <>

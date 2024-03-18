@@ -13,8 +13,13 @@ interface BoardPageProps {
 }
 
 export default async function BoardPage({ params }: BoardPageProps) {
-  const [session, board, stats, suggestions] = await Promise.all([
-    getServerAuthSession(),
+  const session = await getServerAuthSession();
+
+  if (!session?.user) {
+    redirect("/auth/signin");
+  }
+
+  const [board, stats, suggestions] = await Promise.all([
     api.boards.get.query({ slug: params.slug }),
     api.suggestions.getStats.query({ slug: params.slug }),
     api.suggestions.getAll.query({ slug: params.slug, page: 0 }),
