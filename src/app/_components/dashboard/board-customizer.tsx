@@ -42,7 +42,6 @@ export const BoardCustomizer = memo(({ theme, board }: SelectThemeProps) => {
     resolver: zodResolver(formSchema),
     defaultValues: { name: theme?.name ?? boardThemes.at(0)!.name },
   });
-  console.log("theme?.name", theme?.name);
 
   const createBoardHandler = api.boards.setTheme.useMutation();
 
@@ -112,7 +111,6 @@ export const BoardCustomizer = memo(({ theme, board }: SelectThemeProps) => {
         <PublicBoard
           suggestions={EXAMPLE_SUGGESTIONS}
           board={board}
-          isLoggedIn={true}
           themeCSS={convertThemeToCssString({
             theme: boardThemes.find((t) => t.name === form.watch("name"))!,
             selector: `.board-main`,

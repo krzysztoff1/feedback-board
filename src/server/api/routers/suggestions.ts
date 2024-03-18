@@ -1,33 +1,9 @@
-import { desc, eq } from "drizzle-orm";
+import { and, eq, count } from "drizzle-orm";
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
-import { suggestions, users } from "~/server/db/schema";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { suggestions, suggestionsUpVotes } from "~/server/db/schema";
 
 export const suggestionsRouter = createTRPCRouter({
-  get: publicProcedure
-    .input(
-      z.object({
-        boardId: z.number(),
-        page: z.number(),
-        offset: z.number(),
-      }),
-    )
-    .query(async ({ input, ctx }) => {
-      const PAGE_SIZE = 10;
-
-      return await ctx.db
-        .select()
-        .from(suggestions)
-        .leftJoin(users, eq(suggestions.createdBy, users.id))
-        .orderBy(desc(suggestions.createdAt))
-        .where(eq(suggestions.boardId, input.boardId))
-        .limit(PAGE_SIZE)
-        .offset(input.page * PAGE_SIZE);
-    }),
   create: protectedProcedure
     .input(
       z.object({
@@ -45,5 +21,84 @@ export const suggestionsRouter = createTRPCRouter({
         title: input.title,
         createdBy: uid,
       });
+    }),
+  checkUpVote: protectedProcedure
+    .input(
+      z.object({
+        boardId: z.number(),
+        suggestionId: z.number(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const uid = ctx.session.user.id;
+
+      return ctx.db.query.suggestionsUpVotes.findFirst({
+        where(fields, operators) {
+          return and(
+            operators.eq(fields.boardId, input.boardId),
+            operators.eq(fields.suggestionId, input.suggestionId),
+            operators.eq(fields.userId, uid),
+          );
+        },
+      });
+    }),
+  toggleUpVote: protectedProcedure
+    .input(
+      z.object({
+        boardId: z.number(),
+        suggestionId: z.number(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const uid = ctx.session.user.id;
+      const isAlreadyUpVoted = await ctx.db.query.suggestionsUpVotes.findFirst({
+        where(fields, operators) {
+          return and(
+            operators.eq(fields.boardId, input.boardId),
+            operators.eq(fields.suggestionId, input.suggestionId),
+            operators.eq(fields.userId, uid),
+          );
+        },
+      });
+
+      if (isAlreadyUpVoted) {
+        await ctx.db
+          .delete(suggestionsUpVotes)
+          .where(
+            and(
+              eq(suggestionsUpVotes.boardId, input.boardId),
+              eq(suggestionsUpVotes.suggestionId, input.suggestionId),
+              eq(suggestionsUpVotes.userId, uid),
+            ),
+          );
+      } else {
+        await ctx.db.insert(suggestionsUpVotes).values({
+          boardId: input.boardId,
+          suggestionId: input.suggestionId,
+          userId: uid,
+        });
+      }
+
+      const newCount = await ctx.db
+        .select({ _count: count(suggestionsUpVotes.id) })
+        .from(suggestionsUpVotes)
+        .where(
+          and(
+            eq(suggestionsUpVotes.suggestionId, input.suggestionId),
+            eq(suggestionsUpVotes.boardId, input.boardId),
+          ),
+        );
+
+      await ctx.db
+        .update(suggestions)
+        .set({ upVotes: newCount[0]?._count })
+        .where(
+          and(
+            eq(suggestions.id, input.suggestionId),
+            eq(suggestions.boardId, input.boardId),
+          ),
+        );
+
+      return !isAlreadyUpVoted;
     }),
 });

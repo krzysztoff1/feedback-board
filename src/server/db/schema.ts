@@ -72,6 +72,19 @@ export const suggestions = createTable(
   }),
 );
 
+export const suggestionsUpVotes = createTable("suggestionsUpVotes", {
+  id: serial("id").primaryKey(),
+  boardId: integer("boardId")
+    .notNull()
+    .references(() => boards.id),
+  suggestionId: integer("suggestionId")
+    .notNull()
+    .references(() => suggestions.id),
+  userId: varchar("userId", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+});
+
 export const users = createTable("user", {
   id: varchar("id", { length: 255 }).notNull().primaryKey(),
   name: varchar("name", { length: 255 }),
