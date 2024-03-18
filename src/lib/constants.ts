@@ -3,7 +3,7 @@ import type { RouterOutput } from "~/server/api/root";
 
 export const MAX_NUMBER_OF_BOARDS = 3;
 
-export const SITE_URL = env.SITE_URL;
+export const SITE_URL = env.NEXT_PUBLIC_SITE_URL;
 
 export const EXAMPLE_SUGGESTIONS: RouterOutput["boards"]["getPublicBoardData"]["suggestions"] =
   [
