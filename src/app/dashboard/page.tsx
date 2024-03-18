@@ -25,7 +25,7 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
     const redirectUrl =
       process.env.NODE_ENV === "production"
         ? prodReturnUrl.href
-        : `/view/${returnToBoard}`;
+        : `/dashboard/${returnToBoard}/view`;
 
     redirect(redirectUrl);
   }
@@ -42,13 +42,14 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
     redirect(redirectUrl.href);
   }
 
-  const session = await getServerAuthSession();
+  const [session, userBoards] = await Promise.all([
+    getServerAuthSession(),
+    api.boards.getAll.query(),
+  ]);
 
   if (!session?.user) {
     redirect("/auth/signin");
   }
-
-  const userBoards = await api.boards.getAll.query();
 
   return (
     <>
