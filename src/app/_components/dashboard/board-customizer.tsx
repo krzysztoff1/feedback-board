@@ -59,6 +59,7 @@ export const BoardCustomizer = memo(({ theme, board }: SelectThemeProps) => {
         themeCSS: convertThemeToCssString({
           theme: selectedTheme,
         }),
+        id: board.id,
       });
     } catch (error) {
       //
