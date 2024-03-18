@@ -1,67 +1,9 @@
-import { type AnyColumn, and, desc, eq, sql, count } from "drizzle-orm";
+import { and, eq, count } from "drizzle-orm";
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
-import { suggestions, suggestionsUpVotes, users } from "~/server/db/schema";
-
-const increment = (column: AnyColumn, value = 1) => {
-  return sql`${column} + ${value}`;
-};
-
-const decrement = (column: AnyColumn, value = 1) => {
-  return sql`${column} - ${value}`;
-};
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { suggestions, suggestionsUpVotes } from "~/server/db/schema";
 
 export const suggestionsRouter = createTRPCRouter({
-  get: publicProcedure
-    .input(z.object({ boardId: z.number(), page: z.number() }))
-    .query(async ({ input, ctx }) => {
-      const PAGE_SIZE = 10;
-      const uid = ctx?.session?.user.id;
-
-      const [board, boardSuggestions, upVotedSuggestions] = await Promise.all([
-        ctx.db.query.boards.findFirst({
-          where(fields, operators) {
-            return operators.eq(fields.id, input.boardId);
-          },
-        }),
-        ctx.db
-          .select()
-          .from(suggestions)
-          .leftJoin(users, eq(suggestions.createdBy, users.id))
-          .orderBy(desc(suggestions.createdAt))
-          .where(eq(suggestions.boardId, input.boardId))
-          .limit(PAGE_SIZE)
-          .offset(input.page * PAGE_SIZE),
-        uid
-          ? ctx.db.query.suggestionsUpVotes.findMany({
-              where(fields) {
-                return and(
-                  eq(fields.boardId, input.boardId),
-                  eq(fields.userId, uid),
-                );
-              },
-            })
-          : [],
-      ]);
-      return {
-        board,
-        suggestions: boardSuggestions.map((suggestion) => {
-          return {
-            ...suggestion.suggestions,
-            user: suggestion.user,
-            isUpVoted: upVotedSuggestions.some(
-              (upVotedSuggestion) =>
-                upVotedSuggestion.suggestionId === suggestion.suggestions.id &&
-                upVotedSuggestion.boardId === suggestion.suggestions.boardId,
-            ),
-          };
-        }),
-      };
-    }),
   create: protectedProcedure
     .input(
       z.object({

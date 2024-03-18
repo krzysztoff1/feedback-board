@@ -14,8 +14,8 @@ import { ArrowBigUp } from "lucide-react";
 import { api } from "~/trpc/react";
 
 interface PublicBoardProps {
-  readonly board: RouterOutput["suggestions"]["get"]["board"];
-  readonly suggestions: RouterOutput["suggestions"]["get"]["suggestions"];
+  readonly board: RouterOutput["boards"]["getPublicBoardData"]["board"];
+  readonly suggestions: RouterOutput["boards"]["getPublicBoardData"]["suggestions"];
   readonly isLoggedIn: boolean;
   readonly isPreview: boolean;
   readonly themeCSS?: string;

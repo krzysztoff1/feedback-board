@@ -23,7 +23,7 @@ export default async function Home() {
       : undefined;
 
   if (board) {
-    const boardData = await api.suggestions.get.query({
+    const boardData = await api.boards.getPublicBoardData.query({
       boardId: board.id,
       page: 0,
     });

@@ -14,7 +14,7 @@ export default async function View({ params }: { params: { slug: string } }) {
     redirect(SITE_URL);
   }
 
-  const boardData = await api.suggestions.get.query({
+  const boardData = await api.boards.getPublicBoardData.query({
     boardId: board?.id,
     page: 0,
   });

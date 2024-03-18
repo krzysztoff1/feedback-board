@@ -4,7 +4,7 @@ export const MAX_NUMBER_OF_BOARDS = 3;
 
 export const SITE_URL = "https://goog.info";
 
-export const EXAMPLE_SUGGESTIONS: RouterOutput["suggestions"]["get"]["suggestions"] =
+export const EXAMPLE_SUGGESTIONS: RouterOutput["boards"]["getPublicBoardData"]["suggestions"] =
   [
     {
       id: 1,
@@ -17,11 +17,8 @@ export const EXAMPLE_SUGGESTIONS: RouterOutput["suggestions"]["get"]["suggestion
       updatedAt: new Date(),
       isUpVoted: false,
       user: {
-        id: "1",
-        email: "example@example.pl",
-        name: "Test",
-        emailVerified: new Date(),
-        image: "https://example.com",
+        name: "Jan Kowalski",
+        image: null,
       },
     },
   ];

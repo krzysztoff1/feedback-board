@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { boardThemeSchema } from "~/lib/board-theme.schema";
 import {
@@ -6,7 +6,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { boards } from "~/server/db/schema";
+import { boards, suggestions, users } from "~/server/db/schema";
 
 export const boardsRouter = createTRPCRouter({
   getAll: protectedProcedure.query(async ({ ctx }) => {
@@ -30,6 +30,55 @@ export const boardsRouter = createTRPCRouter({
           );
         },
       });
+    }),
+  getPublicBoardData: publicProcedure
+    .input(z.object({ boardId: z.number(), page: z.number() }))
+    .query(async ({ input, ctx }) => {
+      const PAGE_SIZE = 10;
+      const uid = ctx?.session?.user.id;
+
+      const [board, boardSuggestions, upVotedSuggestions] = await Promise.all([
+        ctx.db.query.boards.findFirst({
+          where(fields, operators) {
+            return operators.eq(fields.id, input.boardId);
+          },
+        }),
+        ctx.db
+          .select()
+          .from(suggestions)
+          .leftJoin(users, eq(suggestions.createdBy, users.id))
+          .orderBy(desc(suggestions.createdAt))
+          .where(eq(suggestions.boardId, input.boardId))
+          .limit(PAGE_SIZE)
+          .offset(input.page * PAGE_SIZE),
+        uid
+          ? ctx.db.query.suggestionsUpVotes.findMany({
+              where(fields) {
+                return and(
+                  eq(fields.boardId, input.boardId),
+                  eq(fields.userId, uid),
+                );
+              },
+            })
+          : [],
+      ]);
+      return {
+        board,
+        suggestions: boardSuggestions.map((suggestion) => {
+          return {
+            ...suggestion.suggestions,
+            user: {
+              name: suggestion?.user?.name,
+              image: suggestion?.user?.image,
+            },
+            isUpVoted: upVotedSuggestions.some(
+              (upVotedSuggestion) =>
+                upVotedSuggestion.suggestionId === suggestion.suggestions.id &&
+                upVotedSuggestion.boardId === suggestion.suggestions.boardId,
+            ),
+          };
+        }),
+      };
     }),
   getPublic: publicProcedure
     .input(
