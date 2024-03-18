@@ -25,7 +25,7 @@ export default async function Page() {
   const hostName = headersList.get("x-hostname") ?? "";
   const isSubdomain = hostName.split(".").length > 2;
 
-  if (isSubdomain) {
+  if (isSubdomain && process.env.VERCEL_ENV === "production") {
     const searchParams = new URLSearchParams();
     searchParams.append("targetHostName", hostName);
     searchParams.append("isSubdomain", String(isSubdomain));
