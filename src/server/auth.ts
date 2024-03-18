@@ -3,19 +3,31 @@ import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
+  type AuthOptions,
 } from "next-auth";
 import { type Adapter } from "next-auth/adapters";
 import DiscordProvider from "next-auth/providers/discord";
 import GitHubProvider from "next-auth/providers/github";
 
 import { env } from "~/env";
+import { SITE_URL } from "~/lib/constants";
 import { db } from "~/server/db";
 import { createTable } from "~/server/db/schema";
 
 const useSecureCookies = !!process.env.VERCEL_URL;
 
-const domain =
-  process.env.NODE_ENV === "production" ? ".goog.info" : "localhost";
+const productionCookies: AuthOptions["cookies"] = {
+  sessionToken: {
+    name: `${useSecureCookies ? "__Secure-" : ""}next-auth.session-token`,
+    options: {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      secure: useSecureCookies,
+      domain: `.${SITE_URL.replace("https://", "")}`,
+    },
+  },
+};
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -78,18 +90,8 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/auth/signin",
   },
-  cookies: {
-    sessionToken: {
-      name: `${useSecureCookies ? "__Secure-" : ""}next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: useSecureCookies,
-        domain,
-      },
-    },
-  },
+  cookies:
+    process.env.VERCEL_ENV === "production" ? productionCookies : undefined,
 };
 
 /**
