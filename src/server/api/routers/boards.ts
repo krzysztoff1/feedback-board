@@ -32,36 +32,35 @@ export const boardsRouter = createTRPCRouter({
       });
     }),
   getPublicBoardData: publicProcedure
-    .input(z.object({ boardId: z.number(), page: z.number() }))
+    .input(z.object({ slug: z.string(), page: z.number() }))
     .query(async ({ input, ctx }) => {
       const PAGE_SIZE = 10;
       const uid = ctx?.session?.user.id;
+      const board = await ctx.db.query.boards.findFirst({
+        where(fields, operators) {
+          return operators.eq(fields.slug, input.slug);
+        },
+      });
+      const boardId = board?.id ?? -1;
 
-      const [board, boardSuggestions, upVotedSuggestions] = await Promise.all([
-        ctx.db.query.boards.findFirst({
-          where(fields, operators) {
-            return operators.eq(fields.id, input.boardId);
-          },
-        }),
+      const [boardSuggestions, upVotedSuggestions] = await Promise.all([
         ctx.db
           .select()
           .from(suggestions)
           .leftJoin(users, eq(suggestions.createdBy, users.id))
           .orderBy(desc(suggestions.createdAt))
-          .where(eq(suggestions.boardId, input.boardId))
+          .where(eq(suggestions.boardId, boardId))
           .limit(PAGE_SIZE)
           .offset(input.page * PAGE_SIZE),
         uid
           ? ctx.db.query.suggestionsUpVotes.findMany({
               where(fields) {
-                return and(
-                  eq(fields.boardId, input.boardId),
-                  eq(fields.userId, uid),
-                );
+                return and(eq(fields.boardId, boardId), eq(fields.userId, uid));
               },
             })
           : [],
       ]);
+
       return {
         board,
         suggestions: boardSuggestions.map((suggestion) => {

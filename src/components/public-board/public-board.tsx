@@ -16,19 +16,12 @@ import { api } from "~/trpc/react";
 interface PublicBoardProps {
   readonly board: RouterOutput["boards"]["getPublicBoardData"]["board"];
   readonly suggestions: RouterOutput["boards"]["getPublicBoardData"]["suggestions"];
-  readonly isLoggedIn: boolean;
   readonly isPreview: boolean;
   readonly themeCSS?: string;
 }
 
 export const PublicBoard = memo(
-  ({
-    board,
-    suggestions,
-    isLoggedIn,
-    isPreview,
-    themeCSS = "",
-  }: PublicBoardProps) => {
+  ({ board, suggestions, isPreview, themeCSS = "" }: PublicBoardProps) => {
     const session = useSession();
     const signInRedirectSearchParams = new URLSearchParams({
       targetHostName:
@@ -56,36 +49,37 @@ export const PublicBoard = memo(
           <header className="flex w-full flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center">
             <h1 className="text-2xl font-bold">{board.name}</h1>
             <div className="flex items-center gap-4">
-              {isLoggedIn ? (
-                <Popover>
-                  <PopoverTrigger
-                    style={isPreview ? { pointerEvents: "none" } : {}}
-                    asChild
-                  >
-                    <Button variant={"default"}>Create Suggestion</Button>
-                  </PopoverTrigger>
-                  <PopoverContent>
-                    <CreateSuggestionForm boardId={board.id} />
-                  </PopoverContent>
-                </Popover>
-              ) : (
+              {session.status === "authenticated" ? (
+                <>
+                  <Popover>
+                    <PopoverTrigger
+                      style={isPreview ? { pointerEvents: "none" } : {}}
+                      asChild
+                    >
+                      <Button variant={"default"}>Create Suggestion</Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <CreateSuggestionForm boardId={board.id} />
+                    </PopoverContent>
+                  </Popover>
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src={session.data?.user?.image ?? ""}
+                      alt="Profile picture"
+                    />
+                    <AvatarFallback>
+                      {session.data?.user?.name?.[0]?.toUpperCase() ?? "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                </>
+              ) : null}
+
+              {session.status === "unauthenticated" ? (
                 <Link
                   href={`${process.env.NODE_ENV === "production" ? SITE_URL : ""}/auth/signin?${signInRedirectSearchParams.toString()}`}
                 >
                   <Button variant={"default"}>Sign in</Button>
                 </Link>
-              )}
-
-              {session.status === "authenticated" ? (
-                <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    src={session.data?.user?.image ?? ""}
-                    alt="Profile picture"
-                  />
-                  <AvatarFallback>
-                    {session.data?.user?.name?.[0]?.toUpperCase() ?? "U"}
-                  </AvatarFallback>
-                </Avatar>
               ) : null}
             </div>
           </header>

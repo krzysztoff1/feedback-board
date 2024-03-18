@@ -1,30 +1,29 @@
 import { redirect } from "next/navigation";
 import { PublicBoard } from "~/components/public-board/public-board";
 import { SITE_URL } from "~/lib/constants";
-import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
 
-export default async function View({ params }: { params: { slug: string } }) {
-  const boardPromise = api.boards.getPublic.query({ slug: params.slug });
-  const sessionPromise = getServerAuthSession();
+interface ViewProps {
+  readonly params: {
+    readonly slug: string;
+  };
+}
 
-  const [board, session] = await Promise.all([boardPromise, sessionPromise]);
-
-  if (!board) {
-    redirect(SITE_URL);
-  }
-
+export default async function View({ params }: ViewProps) {
   const boardData = await api.boards.getPublicBoardData.query({
-    boardId: board?.id,
+    slug: params.slug,
     page: 0,
   });
 
+  if (!boardData.board) {
+    redirect(SITE_URL);
+  }
+
   return (
     <PublicBoard
-      isLoggedIn={Boolean(session)}
       board={boardData.board}
       suggestions={boardData.suggestions}
-      themeCSS={board?.themeCSS ?? ""}
+      themeCSS={boardData.board?.themeCSS ?? ""}
       isPreview={false}
     />
   );

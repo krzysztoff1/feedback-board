@@ -1,6 +1,5 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { headers } from "next/headers";
-import { getServerAuthSession } from "~/server/auth";
 import { redirect } from "next/navigation";
 import { api } from "~/trpc/server";
 import { PublicBoard } from "~/components/public-board/public-board";
@@ -16,15 +15,10 @@ export default async function Home() {
   const hostName = headersList.get("x-hostname") ?? "";
   const isSubdomain = hostName.split(".").length > 2;
   const firstPartOfHostName = hostName.split(".")[0];
-  const session = await getServerAuthSession();
-  const board =
-    firstPartOfHostName && isSubdomain
-      ? await api.boards.getPublic.query({ slug: firstPartOfHostName })
-      : undefined;
 
-  if (board) {
+  if (firstPartOfHostName && isSubdomain) {
     const boardData = await api.boards.getPublicBoardData.query({
-      boardId: board.id,
+      slug: firstPartOfHostName,
       page: 0,
     });
 
@@ -32,9 +26,8 @@ export default async function Home() {
       <PublicBoard
         suggestions={boardData.suggestions}
         board={boardData.board}
-        isLoggedIn={Boolean(session)}
         isPreview={false}
-        themeCSS={board.themeCSS ?? ""}
+        themeCSS={boardData.board?.themeCSS ?? ""}
       />
     );
   }

@@ -111,7 +111,6 @@ export const BoardCustomizer = memo(({ theme, board }: SelectThemeProps) => {
         <PublicBoard
           suggestions={EXAMPLE_SUGGESTIONS}
           board={board}
-          isLoggedIn={true}
           themeCSS={convertThemeToCssString({
             theme: boardThemes.find((t) => t.name === form.watch("name"))!,
             selector: `.board-main`,
