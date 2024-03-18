@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BoardCustomizer } from "~/app/_components/dashboard/board-customizer";
 import { Button } from "~/components/ui/button";
+import { SITE_URL } from "~/lib/constants";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
 
@@ -28,8 +29,8 @@ export default async function BoardPage({ params }: BoardPageProps) {
 
         <Link
           href={
-            process.env.NODE_ENV === "production"
-              ? `https://${board.slug}.goog.info`
+            process.env.VERCEL_ENV === "production"
+              ? `https://${board.slug}.${SITE_URL.replace("https://", "")}`
               : `/view/${board.slug}`
           }
           className="block"
