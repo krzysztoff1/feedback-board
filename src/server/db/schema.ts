@@ -72,27 +72,18 @@ export const suggestions = createTable(
   }),
 );
 
-export const suggestionsUpVotes = createTable(
-  "suggestionsUpVotes",
-  {
-    boardId: integer("boardId")
-      .notNull()
-      .references(() => boards.id),
-    suggestionId: integer("suggestionId")
-      .notNull()
-      .references(() => suggestions.id),
-    userId: varchar("userId", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-  },
-  (example) => ({
-    compoundKey: primaryKey({
-      columns: [example.suggestionId, example.userId],
-    }),
-    suggestionIdIdx: index("suggestionId_idx").on(example.suggestionId),
-    userIdIdx: index("userId_idx").on(example.userId),
-  }),
-);
+export const suggestionsUpVotes = createTable("suggestionsUpVotes", {
+  id: serial("id").primaryKey(),
+  boardId: integer("boardId")
+    .notNull()
+    .references(() => boards.id),
+  suggestionId: integer("suggestionId")
+    .notNull()
+    .references(() => suggestions.id),
+  userId: varchar("userId", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+});
 
 export const users = createTable("user", {
   id: varchar("id", { length: 255 }).notNull().primaryKey(),

@@ -50,6 +50,13 @@
       "when": 1710756380910,
       "tag": "0006_flat_the_phantom",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1710787810265,
+      "tag": "0007_easy_queen_noir",
+      "breakpoints": true
     }
   ]
 }

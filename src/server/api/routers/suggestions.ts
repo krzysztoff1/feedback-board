@@ -1,4 +1,4 @@
-import { type AnyColumn, and, desc, eq, sql } from "drizzle-orm";
+import { type AnyColumn, and, desc, eq, sql, count } from "drizzle-orm";
 import { z } from "zod";
 import {
   createTRPCRouter,
@@ -120,48 +120,42 @@ export const suggestionsRouter = createTRPCRouter({
       });
 
       if (isAlreadyUpVoted) {
-        await Promise.all([
-          ctx.db
-            .delete(suggestionsUpVotes)
-            .where(
-              and(
-                eq(suggestionsUpVotes.boardId, input.boardId),
-                eq(suggestionsUpVotes.suggestionId, input.suggestionId),
-                eq(suggestionsUpVotes.userId, uid),
-              ),
+        await ctx.db
+          .delete(suggestionsUpVotes)
+          .where(
+            and(
+              eq(suggestionsUpVotes.boardId, input.boardId),
+              eq(suggestionsUpVotes.suggestionId, input.suggestionId),
+              eq(suggestionsUpVotes.userId, uid),
             ),
-          await ctx.db
-            .update(suggestions)
-            .set({
-              upVotes: decrement(suggestions.upVotes),
-            })
-            .where(
-              and(
-                eq(suggestions.id, input.suggestionId),
-                eq(suggestions.boardId, input.boardId),
-              ),
-            ),
-        ]);
+          );
       } else {
-        await Promise.all([
-          ctx.db
-            .update(suggestions)
-            .set({
-              upVotes: increment(suggestions.upVotes),
-            })
-            .where(
-              and(
-                eq(suggestions.id, input.suggestionId),
-                eq(suggestions.boardId, input.boardId),
-              ),
-            ),
-          ctx.db.insert(suggestionsUpVotes).values({
-            boardId: input.boardId,
-            suggestionId: input.suggestionId,
-            userId: uid,
-          }),
-        ]);
+        await ctx.db.insert(suggestionsUpVotes).values({
+          boardId: input.boardId,
+          suggestionId: input.suggestionId,
+          userId: uid,
+        });
       }
+
+      const newCount = await ctx.db
+        .select({ _count: count(suggestionsUpVotes.id) })
+        .from(suggestionsUpVotes)
+        .where(
+          and(
+            eq(suggestionsUpVotes.suggestionId, input.suggestionId),
+            eq(suggestionsUpVotes.boardId, input.boardId),
+          ),
+        );
+
+      await ctx.db
+        .update(suggestions)
+        .set({ upVotes: newCount[0]?._count })
+        .where(
+          and(
+            eq(suggestions.id, input.suggestionId),
+            eq(suggestions.boardId, input.boardId),
+          ),
+        );
 
       return !isAlreadyUpVoted;
     }),
