@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { BoardSwitcher } from "./board-switcher";
 
 export const TopBar = memo(() => {
   const session = useSession();
@@ -25,7 +26,7 @@ export const TopBar = memo(() => {
               Feedback Board
             </span>
           </Link>
-          {/* <BoardSwitcher /> */}
+          <BoardSwitcher />
         </div>
         <div className="flex items-center space-x-4">
           <DropdownMenu>
