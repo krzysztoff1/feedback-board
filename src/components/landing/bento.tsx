@@ -63,17 +63,25 @@ export const BentoGridItem = ({
 
 export const Features = () => {
   return (
-    <BentoGrid className="mx-auto my-24 max-w-4xl p-8">
-      {items.map((item, i) => (
-        <BentoGridItem
-          key={i}
-          title={item.title}
-          description={item.description}
-          icon={item.icon}
-          className={i === 3 || i === 6 ? "md:col-span-2" : ""}
-        />
-      ))}
-    </BentoGrid>
+    <div className="mb-96 mt-32 flex w-full flex-col items-center justify-start">
+      <div className="flex flex-col items-center justify-center p-4">
+        <h3 className="mb-2 text-2xl font-bold text-primary">Some features</h3>
+        <p className="max-w-md text-center text-white/90">
+          Here are some features of Suggestli
+        </p>
+      </div>
+      <BentoGrid className="mx-auto max-w-4xl p-8">
+        {items.map((item, i) => (
+          <BentoGridItem
+            key={i}
+            title={item.title}
+            description={item.description}
+            icon={item.icon}
+            className={i === 3 || i === 6 ? "md:col-span-2" : ""}
+          />
+        ))}
+      </BentoGrid>
+    </div>
   );
 };
 
@@ -89,7 +97,7 @@ const items = [
     icon: <FileIcon className="h-4 w-4 text-neutral-500" />,
   },
   {
-    title: "Customizable (coming soon)",
+    title: "Customizable",
     description: "Customize your board to fit your brand.",
     icon: <SignalIcon className="h-4 w-4 text-neutral-500" />,
   },

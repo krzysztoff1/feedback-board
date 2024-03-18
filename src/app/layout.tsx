@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Feedback board",
-  description: "A feedback board for your team",
+  title: "Suggestli",
+  description: "Suggestli is a tool to collect and vote on ideas",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

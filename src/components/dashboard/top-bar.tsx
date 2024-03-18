@@ -23,7 +23,7 @@ export const TopBar = memo(() => {
         <div className="flex items-center space-x-2">
           <Link href="/dashboard">
             <span className="text-2xl font-bold text-foreground">
-              Feedback Board
+              Suggestli
             </span>
           </Link>
           <BoardSwitcher />
