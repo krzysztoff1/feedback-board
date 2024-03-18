@@ -87,7 +87,7 @@ export const CreateSuggestionForm = memo(
           <Button type="submit" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? (
               <>
-                <Loader className="animate-spin" size={16} />
+                <Loader className="mr-2 animate-spin" size={16} />
                 Creating...
               </>
             ) : (

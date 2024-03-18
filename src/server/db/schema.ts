@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
+  json,
   pgTableCreator,
   primaryKey,
   serial,
@@ -10,6 +11,8 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
+import type { BoardTheme } from "~/lib/board-theme.schema";
+import { boardThemes } from "~/lib/board-themes";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -35,6 +38,8 @@ export const boards = createTable(
     ownerId: varchar("ownerId", { length: 255 })
       .notNull()
       .references(() => users.id),
+    theme: json("theme").default(boardThemes.at(0)!).$type<BoardTheme>(),
+    themeCSS: text("themeCSS"),
   },
   (example) => ({
     createdByIdIdx: index("createdById_idx").on(example.createdById),

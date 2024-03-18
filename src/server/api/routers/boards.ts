@@ -1,5 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
+import { boardThemeSchema } from "~/lib/board-theme.schema";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -80,6 +81,24 @@ export const boardsRouter = createTRPCRouter({
       }
 
       await Promise.all(promises);
+    }),
+  setTheme: protectedProcedure
+    .input(
+      z.object({
+        theme: boardThemeSchema,
+        themeCSS: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const uid = ctx.session.user.id;
+
+      await ctx.db
+        .update(boards)
+        .set({
+          theme: input.theme,
+          themeCSS: input.themeCSS,
+        })
+        .where(eq(boards.ownerId, uid));
     }),
   validateBoardSlug: protectedProcedure
     .input(

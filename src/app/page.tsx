@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { getServerAuthSession } from "~/server/auth";
 import { redirect } from "next/navigation";
 import { api } from "~/trpc/server";
-import { PublicBoard } from "~/components/public-board/PublicBoard";
+import { PublicBoard } from "~/components/public-board/public-board";
 import { SITE_URL } from "~/lib/constants";
 import { Hero } from "./landing/hero";
 import { Features } from "./landing/bento";
@@ -34,6 +34,8 @@ export default async function Home() {
         suggestions={suggestions}
         board={board}
         isLoggedIn={Boolean(session)}
+        isPreview={false}
+        themeCSS={board.themeCSS ?? ""}
       />
     );
   }

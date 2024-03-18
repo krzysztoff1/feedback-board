@@ -24,7 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          "dark min-h-screen bg-background font-sans antialiased",
+          "dark min-h-screen bg-background font-sans antialiased transition-colors duration-200 ease-in-out",
           inter.className,
         )}
       >

@@ -3,11 +3,11 @@ import { getServerAuthSession } from "~/server/auth";
 import { redirect } from "next/navigation";
 import { Boards } from "../_components/dashboard/boards";
 
-export default async function Dashboard({
-  searchParams,
-}: {
-  searchParams: Record<string, string | string[] | undefined>;
-}) {
+interface DashboardProps {
+  readonly searchParams: Record<string, string | string[] | undefined>;
+}
+
+export default async function Dashboard({ searchParams }: DashboardProps) {
   const targetHostName = String(searchParams.targetHostName) ?? "";
   const isSubdomainValid =
     targetHostName.split(".").length > 2 && targetHostName !== "";
