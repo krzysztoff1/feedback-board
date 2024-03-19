@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { SuggestionCard } from "~/components/dashboard/suggestion-card";
+import { SuggestionTable } from "~/components/dashboard/suggestions-table";
 import { Button } from "~/components/ui/button";
 import { SITE_URL } from "~/lib/constants";
 import { getServerAuthSession } from "~/server/auth";
@@ -19,10 +19,9 @@ export default async function BoardPage({ params }: BoardPageProps) {
     redirect("/auth/signin");
   }
 
-  const [board, stats, suggestions] = await Promise.all([
+  const [board, totalSuggestionsCount] = await Promise.all([
     api.boards.get.query({ slug: params.slug }),
-    api.suggestions.getStats.query({ slug: params.slug }),
-    api.suggestions.getAll.query({ slug: params.slug, page: 0 }),
+    api.suggestions.getTotalSuggestionsCount.query({ slug: params.slug }),
   ]);
 
   if (!board || !session || board.createdById !== session?.user.id) {
@@ -46,35 +45,7 @@ export default async function BoardPage({ params }: BoardPageProps) {
         </Link>
       </header>
 
-      <div className="flex flex-col gap-4">
-        <ul className="flex flex-col gap-2">
-          <li className="align-center flex">
-            <span>Your board URL: </span>
-            <Link
-              href={`https://${board.slug}.${SITE_URL.replace("https://", "")}`}
-            >
-              <strong className="ml-2">
-                {`${board.slug}.${SITE_URL.replace("https://", "")}`}
-              </strong>
-            </Link>
-          </li>
-
-          <li className="align-center flex">
-            <span>Total suggestions: </span>
-            <strong className="ml-2">{stats?.totalSuggestions}</strong>
-          </li>
-          <li className="align-center flex">
-            <span>Total upvotes: </span>
-            <strong className="ml-2">{stats?.totalUpvotes}</strong>
-          </li>
-        </ul>
-      </div>
-
-      <ul className="mt-4 flex flex-col gap-4">
-        {suggestions.map((suggestion) => (
-          <SuggestionCard key={suggestion.id} suggestion={suggestion} />
-        ))}
-      </ul>
+      <SuggestionTable totalSuggestionsCount={totalSuggestionsCount} />
     </div>
   );
 }

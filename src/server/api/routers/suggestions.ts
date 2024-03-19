@@ -42,10 +42,15 @@ export const suggestionsRouter = createTRPCRouter({
         },
       });
     }),
-  getAll: protectedProcedure
-    .input(z.object({ slug: z.string(), page: z.number() }))
+  get: protectedProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+        page: z.number(),
+        pageSize: z.number().min(1).max(100),
+      }),
+    )
     .query(async ({ input, ctx }) => {
-      const PAGE_SIZE = 20;
       const uid = ctx.session.user.id;
       const board = await ctx.db.query.boards.findFirst({
         where(fields) {
@@ -64,20 +69,43 @@ export const suggestionsRouter = createTRPCRouter({
         .leftJoin(users, eq(suggestions.createdBy, users.id))
         .orderBy(desc(suggestions.createdAt))
         .where(eq(suggestions.boardId, boardId))
-        .limit(PAGE_SIZE)
-        .offset(input.page * PAGE_SIZE);
+        .limit(input.pageSize)
+        .offset(input.page * input.pageSize);
 
       return res.map(({ suggestions, user }) => ({
         id: suggestions.id,
         title: suggestions.title,
         content: suggestions.content,
         upVotes: suggestions.upVotes,
+        createdAt: suggestions.createdAt,
         user: {
           id: user?.id,
           name: user?.name,
           image: user?.image,
         },
       }));
+    }),
+  getTotalSuggestionsCount: protectedProcedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const uid = ctx.session.user.id;
+      const board = await ctx.db.query.boards.findFirst({
+        where(fields) {
+          return eq(fields.slug, input.slug);
+        },
+      });
+      const boardId = board?.id ?? -1;
+
+      if (!board || board.createdById !== uid) {
+        return 0;
+      }
+
+      const [result] = await ctx.db
+        .select({ _count: count(suggestions.id) })
+        .from(suggestions)
+        .where(eq(suggestions.boardId, boardId));
+
+      return result?._count ?? 0;
     }),
   toggleUpVote: protectedProcedure
     .input(
