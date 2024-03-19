@@ -20,6 +20,7 @@ import {
 import { Button } from "../ui/button";
 import { api } from "~/trpc/react";
 import { useParams } from "next/navigation";
+import { Skeleton } from "../ui/skeleton";
 
 type Row = RouterOutput["suggestions"]["get"][number];
 
@@ -79,6 +80,22 @@ export const SuggestionTable = memo(
       getCoreRowModel: getCoreRowModel(),
       manualPagination: true,
     });
+
+    if (suggestions.error) {
+      return <div>Error: {suggestions.error.message}</div>;
+    }
+
+    if (suggestions.isLoading) {
+      return (
+        <div className="mt-4 rounded-md border">
+          <div className="space-y-4 p-4">
+            {new Array(pagination.pageSize).fill(null).map((_, index) => (
+              <Skeleton key={index} className="h-8" />
+            ))}
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div>
