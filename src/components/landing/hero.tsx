@@ -8,13 +8,13 @@ export const Hero = memo(() => {
       <Spotlight fill="white" />
       <div className="flex h-[75vh] flex-col items-center justify-center px-4">
         <h1 className="text-balance text-center text-4xl font-bold text-white">
-          Suggestion board your way
+          Feedback-driven product development
         </h1>
-        <p className="mt-4 text-center text-white/90">
-          Free and open source <i>forever</i>
+        <p className="mt-4 max-w-xl text-balance text-center text-white/90">
+          {`Prioritize what to build next. Listen to your users. Keep track of what you're working on. Share your roadmap with the world.`}
         </p>
 
-        <div className="mt-8">
+        <div className="mt-8 flex flex-col items-center space-y-2">
           <Link href="/auth/signin">
             <button className="group relative inline-block cursor-pointer rounded-full bg-slate-800 p-px text-xs font-semibold leading-6 text-white no-underline  shadow-2xl shadow-zinc-900">
               <span className="absolute inset-0 overflow-hidden rounded-full">
