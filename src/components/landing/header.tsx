@@ -10,18 +10,18 @@ export const Header = memo(() => {
         <span className="text-md block font-bold text-primary">Suggestli</span>
 
         <nav className="align-center flex space-x-4">
-          <Link
-            href="https://github.com/krzysztoff1/suggestli"
-            aria-label="Github repository"
-          >
-            <Button variant="ghost" role="presentation">
+          <Button variant="ghost" asChild>
+            <Link
+              href="https://github.com/krzysztoff1/suggestli"
+              aria-label="Github repository"
+            >
               <Github className="h-4 w-4 text-primary/70" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
 
-          <Link href="/auth/signin">
-            <Button variant="secondary">Log in</Button>
-          </Link>
+          <Button variant="secondary" asChild>
+            <Link href="/auth/signin">Log in</Link>
+          </Button>
         </nav>
       </header>
     </div>
