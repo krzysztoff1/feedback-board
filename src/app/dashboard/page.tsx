@@ -52,7 +52,7 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
 
   return (
     <>
-      <h1 className="mb-8 text-2xl font-bold">Dashboard</h1>
+      <h1 className="mb-8 text-2xl font-bold">Your boards</h1>
       <div className="flex flex-col gap-4 sm:gap-8">
         <Boards userBoards={userBoards} />
       </div>

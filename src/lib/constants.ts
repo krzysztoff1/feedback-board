@@ -5,6 +5,24 @@ export const MAX_NUMBER_OF_BOARDS = 3;
 
 export const SITE_URL = env.NEXT_PUBLIC_SITE_URL;
 
+export const DISSALLOWED_BOARD_SLUGS = [
+  "new",
+  "boards",
+  "login",
+  "register",
+  "app",
+  "admin",
+  "api",
+  "auth",
+  "settings",
+  "profile",
+  "logout",
+  "reset-password",
+  "forgot-password",
+  "verify-email",
+  "feedback",
+];
+
 export const EXAMPLE_SUGGESTIONS: RouterOutput["boards"]["getPublicBoardData"]["suggestions"] =
   [
     {

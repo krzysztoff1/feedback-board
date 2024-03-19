@@ -33,7 +33,9 @@ export const Boards = memo(({ userBoards: _userBoards }: BoardCardProps) => {
       {userBoards.length >= MAX_NUMBER_OF_BOARDS ? (
         <>{`Uh oh! You've reached the maximum number of boards.`}</>
       ) : (
-        <CreateBoardForm setUserBoards={setUserBoards} />
+        <div className="max-w-xl rounded-lg border p-4">
+          <CreateBoardForm setUserBoards={setUserBoards} />
+        </div>
       )}
     </div>
   );

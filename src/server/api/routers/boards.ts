@@ -1,6 +1,8 @@
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { boardThemeSchema } from "~/lib/board-theme.schema";
+import { DISSALLOWED_BOARD_SLUGS } from "~/lib/constants";
+import { convertToSlug } from "~/lib/utils";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -102,11 +104,15 @@ export const boardsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const uid = ctx.session.user.id;
 
+      if (DISSALLOWED_BOARD_SLUGS.includes(convertToSlug(input.slug))) {
+        throw new Error("Invalid slug");
+      }
+
       await ctx.db.insert(boards).values({
         createdById: uid,
         ownerId: uid,
         name: input.name,
-        slug: input.slug,
+        slug: convertToSlug(input.slug),
       });
     }),
   edit: protectedProcedure
@@ -161,6 +167,14 @@ export const boardsRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
+      if (input.slug.length < 3) {
+        return false;
+      }
+
+      if (DISSALLOWED_BOARD_SLUGS.includes(input.slug)) {
+        return false;
+      }
+
       const boardWithTheSameSlug = await ctx.db.query.boards.findFirst({
         where(fields, operators) {
           return operators.eq(fields.slug, input.slug);
