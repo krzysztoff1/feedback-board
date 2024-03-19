@@ -17,6 +17,7 @@ import { api } from "~/trpc/react";
 import { memo } from "react";
 import { Loader } from "lucide-react";
 import { Textarea } from "../ui/textarea";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   title: z.string().min(1).max(256),
@@ -29,6 +30,7 @@ interface CreateBoardFormProps {
 
 export const CreateSuggestionForm = memo(
   ({ boardId }: CreateBoardFormProps) => {
+    const router = useRouter();
     const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
       defaultValues: { title: "", content: "" },
@@ -36,6 +38,9 @@ export const CreateSuggestionForm = memo(
     const handler = api.suggestions.create.useMutation({
       onSettled: () => {
         form.reset();
+      },
+      onSuccess: () => {
+        router.refresh();
       },
     });
 
@@ -84,7 +89,11 @@ export const CreateSuggestionForm = memo(
             )}
           />
 
-          <Button type="submit" disabled={form.formState.isSubmitting}>
+          <Button
+            type="submit"
+            disabled={form.formState.isSubmitting}
+            className="w-full"
+          >
             {form.formState.isSubmitting ? (
               <>
                 <Loader className="mr-2 animate-spin" size={16} />
