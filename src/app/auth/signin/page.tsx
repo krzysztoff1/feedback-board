@@ -31,7 +31,7 @@ export default async function Page() {
     <main className="grid min-h-screen place-content-center">
       <Card>
         <CardHeader>
-          <CardTitle>Login</CardTitle>
+          <CardTitle>Sign in</CardTitle>
         </CardHeader>
         <CardContent>
           <AuthForm
