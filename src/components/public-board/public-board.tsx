@@ -2,9 +2,7 @@
 
 import { type RouterOutput } from "~/server/api/root";
 import { memo } from "react";
-import { CreateSuggestionForm } from "~/components/dashboard/create-suggestion-form";
 import { Button } from "../ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn, getRelativeTimeString, throttle } from "~/lib/utils";
 import { SITE_URL } from "~/lib/constants";
 import Link from "next/link";
@@ -51,7 +49,13 @@ export const PublicBoard = memo(
           <header className="flex w-full flex-row items-center justify-between gap-4 rounded-lg border border-border bg-card p-4">
             <h1 className="text-2xl font-bold">{board.name}</h1>
             <div className="flex items-center gap-4">
-              <CreateSuggestionModal isPreview={isPreview} boardId={board.id} />
+              {suggestions.length > 0 ? (
+                <CreateSuggestionModal
+                  isPreview={isPreview}
+                  boardId={board.id}
+                />
+              ) : null}
+
               <AnimatePresence>
                 {session.status === "authenticated" ? (
                   <motion.div
@@ -93,28 +97,12 @@ export const PublicBoard = memo(
                 <p className="text-balance text-center text-sm">
                   Let your voice be heard! Create the first suggestion.
                 </p>
-                <AnimatePresence>
-                  {session.status === "authenticated" ? (
-                    <Popover>
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.16 }}
-                      >
-                        <PopoverTrigger
-                          style={isPreview ? { pointerEvents: "none" } : {}}
-                          asChild
-                        >
-                          <Button variant={"default"}>Create Suggestion</Button>
-                        </PopoverTrigger>
-                        <PopoverContent>
-                          <CreateSuggestionForm boardId={board.id} />
-                        </PopoverContent>
-                      </motion.div>
-                    </Popover>
-                  ) : null}
-                </AnimatePresence>
+
+                <CreateSuggestionModal
+                  isPreview={isPreview}
+                  isCta={true}
+                  boardId={board.id}
+                />
 
                 <AnimatePresence>
                   {session.status === "unauthenticated" ? (

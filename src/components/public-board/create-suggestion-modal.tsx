@@ -31,10 +31,11 @@ const animationVariants = {
 interface CreateSuggestionModalProps {
   readonly isPreview: boolean;
   readonly boardId: number;
+  readonly isCta?: boolean;
 }
 
 export const CreateSuggestionModal = memo(
-  ({ isPreview, boardId }: CreateSuggestionModalProps) => {
+  ({ isPreview, boardId, isCta = false }: CreateSuggestionModalProps) => {
     const session = useSession();
     const [open, setOpen] = useState(false);
     const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -55,6 +56,7 @@ export const CreateSuggestionModal = memo(
                   "fixed bottom-4 left-0 right-0 flex justify-center":
                     !isPreview,
                   "pointer-events-none": isPreview,
+                  static: isCta,
                 })}
               >
                 <DialogTrigger asChild>
@@ -87,6 +89,7 @@ export const CreateSuggestionModal = memo(
               className={cn({
                 "fixed bottom-4 left-0 right-0 flex justify-center": !isPreview,
                 "pointer-events-none": isPreview,
+                static: isCta,
               })}
             >
               <DrawerTrigger asChild>
