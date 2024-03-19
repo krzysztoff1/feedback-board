@@ -54,7 +54,7 @@ export const AuthForm = memo(
             ) : (
               <span className="flex items-center">
                 <Image
-                  src={`/providers/${provider.name}.svg`}
+                  src={`/providers/${provider.name.toLowerCase()}.svg`}
                   alt={`${provider.name} icon`}
                   width={24}
                   height={24}
