@@ -20,6 +20,7 @@ import { CreateSuggestionForm } from "../dashboard/create-suggestion-form";
 import { memo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "~/lib/utils";
 
 const animationVariants = {
   initial: { opacity: 0, y: 10 },
@@ -28,11 +29,12 @@ const animationVariants = {
 };
 
 interface CreateSuggestionModalProps {
+  readonly isPreview: boolean;
   readonly boardId: number;
 }
 
 export const CreateSuggestionModal = memo(
-  ({ boardId }: CreateSuggestionModalProps) => {
+  ({ isPreview, boardId }: CreateSuggestionModalProps) => {
     const session = useSession();
     const [open, setOpen] = useState(false);
     const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -49,7 +51,11 @@ export const CreateSuggestionModal = memo(
                 animate="animate"
                 exit="exit"
                 transition={{ duration: 0.2 }}
-                className="fixed bottom-4 left-0 right-0 flex justify-center"
+                className={cn({
+                  "fixed bottom-4 left-0 right-0 flex justify-center":
+                    !isPreview,
+                  "pointer-events-none": isPreview,
+                })}
               >
                 <DialogTrigger asChild>
                   <Button variant="default">Create Suggestion</Button>
@@ -78,7 +84,10 @@ export const CreateSuggestionModal = memo(
               animate="animate"
               exit="exit"
               transition={{ duration: 0.2 }}
-              className="fixed bottom-4 left-0 right-0 flex justify-center"
+              className={cn({
+                "fixed bottom-4 left-0 right-0 flex justify-center": !isPreview,
+                "pointer-events-none": isPreview,
+              })}
             >
               <DrawerTrigger asChild>
                 <Button variant="default">Create Suggestion</Button>

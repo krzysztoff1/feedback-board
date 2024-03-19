@@ -51,7 +51,7 @@ export const PublicBoard = memo(
           <header className="flex w-full flex-row items-center justify-between gap-4 rounded-lg border border-border bg-card p-4">
             <h1 className="text-2xl font-bold">{board.name}</h1>
             <div className="flex items-center gap-4">
-              <CreateSuggestionModal boardId={board.id} />
+              <CreateSuggestionModal isPreview={isPreview} boardId={board.id} />
               <AnimatePresence>
                 {session.status === "authenticated" ? (
                   <motion.div
