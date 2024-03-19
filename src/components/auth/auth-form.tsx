@@ -1,9 +1,11 @@
 "use client";
 
 import { type getProviders, signIn } from "next-auth/react";
-import { Button } from "~/components/ui/button";
 import { memo, useState } from "react";
 import { Loader } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "../ui/button";
 
 interface AuthFormProps {
   readonly providers: Awaited<ReturnType<typeof getProviders>>;
@@ -42,19 +44,33 @@ export const AuthForm = memo(
             }}
             variant={"default"}
             disabled={currentlySigningIn !== null}
+            className="justify-between"
           >
             {currentlySigningIn === provider.id ? (
-              <>
+              <span className="flex items-center">
                 <Loader className="mr-2 h-5 w-5 animate-spin" />
                 Signing in...
-              </>
+              </span>
             ) : (
-              <>
+              <span className="flex items-center">
+                <Image
+                  src={`/providers/${provider.id}.svg`}
+                  alt={`${provider.name} icon`}
+                  width={24}
+                  height={24}
+                  className="mr-3"
+                />
                 Sign in with <strong className="ml-1">{provider.name}</strong>
-              </>
+              </span>
             )}
           </Button>
         ))}
+
+        <Link href="/">
+          <Button variant={"ghost"} size={"sm"}>
+            Back to home
+          </Button>
+        </Link>
       </div>
     );
   },
