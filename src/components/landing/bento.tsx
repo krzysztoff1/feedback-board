@@ -67,9 +67,9 @@ export const Features = () => {
   return (
     <div className="mb-96 mt-32 flex w-full flex-col items-center justify-start">
       <div className="flex flex-col items-center justify-center p-4">
-        <h3 className="mb-2 text-2xl font-bold text-primary">
+        <h2 className="mb-2 text-2xl font-bold text-primary">
           Explore features
-        </h3>
+        </h2>
         <p className="max-w-md text-center text-white/90">
           {`Exchange ideas with your team, collect feedback, and keep track of what you're working on.`}
         </p>
