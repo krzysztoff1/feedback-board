@@ -13,10 +13,10 @@ import {
   FormMessage,
   Form,
 } from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
 import { api } from "~/trpc/react";
 import { memo } from "react";
 import { Loader } from "lucide-react";
+import { Textarea } from "../ui/textarea";
 
 const formSchema = z.object({
   title: z.string().min(1).max(256),
@@ -57,7 +57,7 @@ export const CreateSuggestionForm = memo(
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Best title ever" {...field} />
+                  <Textarea placeholder="Best title ever" {...field} />
                 </FormControl>
                 <FormDescription>
                   Title of your new suggestion. Short and sweet.
@@ -74,7 +74,7 @@ export const CreateSuggestionForm = memo(
               <FormItem>
                 <FormLabel>Content</FormLabel>
                 <FormControl>
-                  <Input placeholder="Best content ever" {...field} />
+                  <Textarea placeholder="Best content ever" {...field} />
                 </FormControl>
                 <FormDescription>
                   Content of your new suggestion. Long and detailed.

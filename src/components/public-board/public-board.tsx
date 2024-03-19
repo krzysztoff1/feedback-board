@@ -12,6 +12,7 @@ import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { ArrowBigUp } from "lucide-react";
 import { api } from "~/trpc/react";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface PublicBoardProps {
   readonly board: RouterOutput["boards"]["getPublicBoardData"]["board"];
@@ -49,30 +50,55 @@ export const PublicBoard = memo(
           <header className="flex w-full flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center">
             <h1 className="text-2xl font-bold">{board.name}</h1>
             <div className="flex items-center gap-4">
-              {session.status === "authenticated" ? (
-                <>
+              <AnimatePresence>
+                {session.status === "authenticated" &&
+                suggestions.length !== 0 ? (
                   <Popover>
-                    <PopoverTrigger
-                      style={isPreview ? { pointerEvents: "none" } : {}}
-                      asChild
+                    <motion.div
+                      className={cn(
+                        "fixed bottom-4 left-0 right-0 flex justify-center",
+                        { hidden: isPreview },
+                      )}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 20 }}
+                      transition={{ duration: 0.16 }}
                     >
-                      <Button variant={"default"}>Create Suggestion</Button>
-                    </PopoverTrigger>
-                    <PopoverContent>
-                      <CreateSuggestionForm boardId={board.id} />
-                    </PopoverContent>
+                      <PopoverTrigger
+                        style={isPreview ? { pointerEvents: "none" } : {}}
+                        asChild
+                      >
+                        <Button variant={"default"}>Create Suggestion</Button>
+                      </PopoverTrigger>
+                      <PopoverContent>
+                        <CreateSuggestionForm boardId={board.id} />
+                      </PopoverContent>
+                    </motion.div>
                   </Popover>
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={session.data?.user?.image ?? ""}
-                      alt="Profile picture"
-                    />
-                    <AvatarFallback>
-                      {session.data?.user?.name?.[0]?.toUpperCase() ?? "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                </>
-              ) : null}
+                ) : null}
+              </AnimatePresence>
+
+              <AnimatePresence>
+                {session.status === "authenticated" ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.16 }}
+                    key={session.data?.user?.id}
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={session.data?.user?.image ?? ""}
+                        alt="Profile picture"
+                      />
+                      <AvatarFallback>
+                        {session.data?.user?.name?.[0]?.toUpperCase() ?? "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
 
               {session.status === "unauthenticated" ? (
                 <Link
@@ -85,11 +111,50 @@ export const PublicBoard = memo(
           </header>
 
           {suggestions.length === 0 ? (
-            <div className="flex h-64 flex-col items-center justify-center gap-4">
+            <div className="mt-8 flex min-h-72 flex-col items-center justify-start gap-4">
               <strong className="text-xl font-bold">No suggestions yet</strong>
-              <p className="text-center text-sm">
-                Be the first to suggest something
+              <p className="text-balance text-center text-sm">
+                Let your voice be heard! Create the first suggestion.
               </p>
+              <AnimatePresence>
+                {session.status === "authenticated" ? (
+                  <Popover>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.16 }}
+                    >
+                      <PopoverTrigger
+                        style={isPreview ? { pointerEvents: "none" } : {}}
+                        asChild
+                      >
+                        <Button variant={"default"}>Create Suggestion</Button>
+                      </PopoverTrigger>
+                      <PopoverContent>
+                        <CreateSuggestionForm boardId={board.id} />
+                      </PopoverContent>
+                    </motion.div>
+                  </Popover>
+                ) : null}
+              </AnimatePresence>
+
+              <AnimatePresence>
+                {session.status === "unauthenticated" ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.16 }}
+                  >
+                    <Link
+                      href={`${process.env.NODE_ENV === "production" ? SITE_URL : ""}/auth/signin?${signInRedirectSearchParams.toString()}`}
+                    >
+                      <Button variant={"default"}>Sign in</Button>
+                    </Link>
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
             </div>
           ) : (
             <ul className="flex w-full flex-col">
