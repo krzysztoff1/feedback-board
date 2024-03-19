@@ -101,7 +101,7 @@ export const PublicBoard = memo(
                 >
                   <button
                     onClick={throttle(async () => {
-                      if (!session || isPreview) {
+                      if (session.status !== "authenticated" || isPreview) {
                         return;
                       }
 
