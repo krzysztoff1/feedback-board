@@ -46,7 +46,6 @@ export const columns: ColumnDef<Row>[] = [
     accessorKey: "createdAt",
     header: "Created At",
     cell: ({ row }) => {
-      console.log(row.getValue("createdAt"));
       const date = new Date(row.getValue("createdAt"));
       return date.toLocaleDateString();
     },
@@ -89,7 +88,7 @@ export const SuggestionTable = memo(
       return (
         <div className="mt-4 rounded-md border">
           <div className="space-y-4 p-4">
-            {new Array(pagination.pageSize).fill(null).map((_, index) => (
+            {new Array(10).fill(null).map((_, index) => (
               <Skeleton key={index} className="h-8" />
             ))}
           </div>
