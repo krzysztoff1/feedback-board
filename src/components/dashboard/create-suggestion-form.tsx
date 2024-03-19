@@ -100,7 +100,7 @@ export const CreateSuggestionForm = memo(
                 Creating...
               </>
             ) : (
-              "Create Board"
+              "Submit"
             )}
           </Button>
         </form>

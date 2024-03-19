@@ -70,7 +70,7 @@ export const EditNameForm = memo(({ name }: EditNameFormProps) => {
               Saving...
             </>
           ) : (
-            "Create Board"
+            "Save"
           )}
         </Button>
       </form>
