@@ -69,3 +69,7 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
     }
   } as T;
 }
+
+export function truncate(text: string, maxLength = 100) {
+  return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+}

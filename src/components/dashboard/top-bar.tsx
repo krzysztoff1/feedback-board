@@ -18,13 +18,14 @@ export const TopBar = memo(() => {
   const session = useSession();
 
   return (
-    <header className="sticky top-0 z-50 flex h-16 w-screen bg-background">
+    <header className="sticky top-0 z-50 flex h-16 w-screen border-b border-border bg-background">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center space-x-2">
-          <Link href="/dashboard">
-            <span className="text-2xl font-bold text-foreground">
-              Suggestli
-            </span>
+          <Link
+            href="/dashboard"
+            className="text-2xl font-bold text-foreground"
+          >
+            Suggestli
           </Link>
           <BoardSwitcher />
         </div>

@@ -3,15 +3,14 @@
 import { type RouterOutput } from "~/server/api/root";
 import { memo } from "react";
 import { Button } from "../ui/button";
-import { cn, getRelativeTimeString, throttle } from "~/lib/utils";
+import { cn } from "~/lib/utils";
 import { SITE_URL } from "~/lib/constants";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { ArrowBigUp } from "lucide-react";
-import { api } from "~/trpc/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CreateSuggestionModal } from "./create-suggestion-modal";
+import { Suggestion } from "./suggestion";
 
 interface PublicBoardProps {
   readonly board: RouterOutput["boards"]["getPublicBoardData"]["board"];
@@ -27,8 +26,6 @@ export const PublicBoard = memo(
       targetHostName:
         typeof window === "undefined" ? "" : window.location.hostname,
     });
-
-    const upVoteHandler = api.suggestions.toggleUpVote.useMutation();
 
     if (!board) {
       return null;
@@ -88,7 +85,7 @@ export const PublicBoard = memo(
             </div>
           </header>
 
-          <div className="w-full rounded-lg border border-border bg-card">
+          <div className="w-full">
             {suggestions.length === 0 ? (
               <div className="mt-8 flex min-h-72 flex-col items-center justify-start gap-4">
                 <strong className="text-xl font-bold">
@@ -122,79 +119,32 @@ export const PublicBoard = memo(
                 </AnimatePresence>
               </div>
             ) : (
-              <ul className="flex w-full flex-col">
+              <motion.ul
+                className="flex w-full flex-col"
+                variants={{
+                  hidden: {
+                    x: "-100vw",
+                  },
+                  visible: {
+                    x: 0,
+                    transition: {
+                      when: "beforeChildren",
+                      staggerChildren: 0.2,
+                    },
+                  },
+                }}
+                animate="visible"
+                initial="hidden"
+              >
                 {suggestions.map((suggestion) => (
-                  <li
+                  <Suggestion
                     key={suggestion.id}
-                    id={`suggestion-${suggestion.id}`}
-                    className="flex border-b last:border-b-0"
-                  >
-                    <button
-                      onClick={throttle(async () => {
-                        if (session.status !== "authenticated" || isPreview) {
-                          return;
-                        }
-
-                        const wrapperSelector = `#suggestion-${suggestion.id}`;
-                        const icon = document.querySelector(
-                          `${wrapperSelector} .upvote-icon`,
-                        );
-                        const counter = document.querySelector(
-                          `${wrapperSelector} .upvote-counter`,
-                        );
-
-                        if (icon && counter) {
-                          if (suggestion.isUpVoted) {
-                            icon.classList.remove("text-primary");
-                            counter.textContent = `${(Number(counter.textContent) ?? 0) - 1}`;
-                          } else {
-                            icon.classList.add("text-primary");
-                            counter.textContent = `${(Number(counter.textContent) ?? 0) + 1}`;
-                          }
-                        }
-
-                        suggestion.isUpVoted = !suggestion.isUpVoted;
-
-                        await upVoteHandler.mutateAsync({
-                          boardId: board.id,
-                          suggestionId: suggestion.id,
-                        });
-                      }, 250)}
-                      className="flex flex-col items-center justify-center gap-1 p-4"
-                    >
-                      <ArrowBigUp
-                        size={24}
-                        className={cn(
-                          "upvote-icon transition-transform hover:scale-105",
-                          { "text-primary": suggestion.isUpVoted },
-                        )}
-                        fill={suggestion.isUpVoted ? "currentColor" : undefined}
-                      />
-                      <span className="upvote-counter block">
-                        {suggestion.upVotes}
-                      </span>
-                    </button>
-                    <div className="flex w-full flex-col pb-4 pr-4 pt-4">
-                      <strong className="text-lg text-primary">
-                        {suggestion.title}
-                      </strong>
-                      <p>
-                        {suggestion.content.length > 100
-                          ? `${suggestion.content.slice(0, 100)}...`
-                          : suggestion.content}
-                      </p>
-                      <div className="flex items-center justify-between gap-2">
-                        <time className="block text-sm">
-                          {getRelativeTimeString(suggestion.createdAt, "en-US")}
-                        </time>
-                        <span className="text-sm">
-                          {suggestion.user?.name ?? "Anonymous"}
-                        </span>
-                      </div>
-                    </div>
-                  </li>
+                    suggestion={suggestion}
+                    isPreview={isPreview}
+                    boardId={board.id}
+                  />
                 ))}
-              </ul>
+              </motion.ul>
             )}
           </div>
 
