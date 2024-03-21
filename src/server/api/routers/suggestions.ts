@@ -1,4 +1,4 @@
-import { and, eq, count, desc, asc, AnyColumn } from "drizzle-orm";
+import { and, eq, count, desc, asc, type AnyColumn } from "drizzle-orm";
 import { z } from "zod";
 import { PAGE_SIZE } from "~/lib/constants";
 import {

@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useState } from "react";
+import { memo, useState } from "react";
 import type { RouterOutput } from "~/server/api/root";
 import {
   Table,
@@ -16,9 +16,9 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
-  SortingState,
+  type SortingState,
   getSortedRowModel,
-  VisibilityState,
+  type VisibilityState,
 } from "@tanstack/react-table";
 import { Button } from "../ui/button";
 import { api } from "~/trpc/react";
