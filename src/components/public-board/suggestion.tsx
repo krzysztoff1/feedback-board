@@ -4,10 +4,9 @@ import { useSession } from "next-auth/react";
 import { memo } from "react";
 import { cn, getRelativeTimeString, throttle, truncate } from "~/lib/utils";
 import { api } from "~/trpc/react";
-import { motion } from "framer-motion";
 
 interface SuggestionProps {
-  readonly suggestion: RouterOutput["boards"]["getPublicBoardData"]["suggestions"][number];
+  readonly suggestion: RouterOutput["suggestions"]["get"][number];
   readonly boardId: number;
   readonly isPreview: boolean;
 }
@@ -47,17 +46,13 @@ export const Suggestion = memo(
     }, 250);
 
     return (
-      <motion.li
+      <li
         id={`suggestion-${suggestion.id}`}
         className={cn(
           "flex border-x border-t border-border bg-card",
           "first:rounded-t-lg",
           "last:rounded-b-lg last:border-b",
         )}
-        variants={{
-          hidden: { y: 20, opacity: 0 },
-          visible: { y: 0, opacity: 1 },
-        }}
       >
         <div className="p-2">
           <button
@@ -92,7 +87,7 @@ export const Suggestion = memo(
             </time>
           </div>
         </div>
-      </motion.li>
+      </li>
     );
   },
 );

@@ -1,6 +1,11 @@
 import { and, eq, count, desc } from "drizzle-orm";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { PAGE_SIZE } from "~/lib/constants";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import { suggestions, suggestionsUpVotes, users } from "~/server/db/schema";
 
 export const suggestionsRouter = createTRPCRouter({
@@ -42,16 +47,16 @@ export const suggestionsRouter = createTRPCRouter({
         },
       });
     }),
-  get: protectedProcedure
+  get: publicProcedure
     .input(
       z.object({
         slug: z.string(),
         page: z.number(),
-        pageSize: z.number().min(1).max(100),
+        pageSize: z.number().min(1).max(100).optional().default(PAGE_SIZE),
       }),
     )
     .query(async ({ input, ctx }) => {
-      const uid = ctx.session.user.id;
+      const uid = ctx?.session?.user.id;
       const board = await ctx.db.query.boards.findFirst({
         where(fields) {
           return eq(fields.slug, input.slug);
@@ -63,21 +68,37 @@ export const suggestionsRouter = createTRPCRouter({
         return [];
       }
 
-      const res = await ctx.db
-        .select()
-        .from(suggestions)
-        .leftJoin(users, eq(suggestions.createdBy, users.id))
-        .orderBy(desc(suggestions.createdAt))
-        .where(eq(suggestions.boardId, boardId))
-        .limit(input.pageSize)
-        .offset(input.page * input.pageSize);
+      const [targetSuggestions, userUpVotes] = await Promise.all([
+        ctx.db
+          .select()
+          .from(suggestions)
+          .leftJoin(users, eq(suggestions.createdBy, users.id))
+          .orderBy(desc(suggestions.createdAt))
+          .where(eq(suggestions.boardId, boardId))
+          .limit(input.pageSize)
+          .offset(input.page * input.pageSize),
+        uid
+          ? ctx.db
+              .select()
+              .from(suggestionsUpVotes)
+              .where(
+                and(
+                  eq(suggestionsUpVotes.userId, uid),
+                  eq(suggestionsUpVotes.boardId, boardId),
+                ),
+              )
+          : [],
+      ]);
 
-      return res.map(({ suggestions, user }) => ({
+      return targetSuggestions.map(({ suggestions, user }) => ({
         id: suggestions.id,
         title: suggestions.title,
         content: suggestions.content,
         upVotes: suggestions.upVotes,
         createdAt: suggestions.createdAt,
+        isUpVoted: userUpVotes.some(
+          (upVote) => upVote.suggestionId === suggestions.id,
+        ),
         user: {
           id: user?.id,
           name: user?.name,

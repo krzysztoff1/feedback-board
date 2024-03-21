@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { z } from "zod";
 import { boardThemeSchema } from "~/lib/board-theme.schema";
 import { DISSALLOWED_BOARD_SLUGS } from "~/lib/constants";
@@ -8,10 +8,10 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { boards, suggestions, users } from "~/server/db/schema";
+import { boards, suggestions } from "~/server/db/schema";
 
 export const boardsRouter = createTRPCRouter({
-  getAll: protectedProcedure.query(async ({ ctx }) => {
+  getUserBoards: protectedProcedure.query(async ({ ctx }) => {
     const uid = ctx.session.user.id;
     return ctx.db.select().from(boards).where(eq(boards.ownerId, uid));
   }),
@@ -33,66 +33,26 @@ export const boardsRouter = createTRPCRouter({
         },
       });
     }),
-  getPublicBoardData: publicProcedure
-    .input(z.object({ slug: z.string(), page: z.number() }))
+  getBoardData: publicProcedure
+    .input(z.object({ slug: z.string() }))
     .query(async ({ input, ctx }) => {
-      const PAGE_SIZE = 10;
-      const uid = ctx?.session?.user.id;
-      const board = await ctx.db.query.boards.findFirst({
+      const targetBoard = await ctx.db.query.boards.findFirst({
         where(fields, operators) {
           return operators.eq(fields.slug, input.slug);
         },
       });
-      const boardId = board?.id ?? -1;
 
-      const [boardSuggestions, upVotedSuggestions] = await Promise.all([
-        ctx.db
-          .select()
-          .from(suggestions)
-          .leftJoin(users, eq(suggestions.createdBy, users.id))
-          .orderBy(desc(suggestions.createdAt))
-          .where(eq(suggestions.boardId, boardId))
-          .limit(PAGE_SIZE)
-          .offset(input.page * PAGE_SIZE),
-        uid
-          ? ctx.db.query.suggestionsUpVotes.findMany({
-              where(fields) {
-                return and(eq(fields.boardId, boardId), eq(fields.userId, uid));
-              },
-            })
-          : [],
-      ]);
+      if (!targetBoard) {
+        return { board: null };
+      }
 
-      return {
-        board,
-        suggestions: boardSuggestions.map((suggestion) => {
-          return {
-            ...suggestion.suggestions,
-            user: {
-              name: suggestion?.user?.name,
-              image: suggestion?.user?.image,
-            },
-            isUpVoted: upVotedSuggestions.some(
-              (upVotedSuggestion) =>
-                upVotedSuggestion.suggestionId === suggestion.suggestions.id &&
-                upVotedSuggestion.boardId === suggestion.suggestions.boardId,
-            ),
-          };
-        }),
-      };
-    }),
-  getPublic: publicProcedure
-    .input(
-      z.object({
-        slug: z.string(),
-      }),
-    )
-    .query(async ({ input, ctx }) => {
-      return ctx.db.query.boards.findFirst({
-        where(fields, operators) {
-          return operators.eq(fields.slug, input.slug);
-        },
-      });
+      const suggestionsCountResult = await ctx.db
+        .select({ count: count(suggestions.id) })
+        .from(suggestions)
+        .where(eq(suggestions.boardId, targetBoard.id));
+      const suggestionsCount = suggestionsCountResult?.[0]?.count ?? 0;
+
+      return { board: { ...targetBoard, suggestionsCount } };
     }),
   create: protectedProcedure
     .input(

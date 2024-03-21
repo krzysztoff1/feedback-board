@@ -1,31 +1,54 @@
 "use client";
 
 import { type RouterOutput } from "~/server/api/root";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Button } from "../ui/button";
 import { cn } from "~/lib/utils";
-import { SITE_URL } from "~/lib/constants";
+import { PAGE_SIZE, SITE_URL } from "~/lib/constants";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { AnimatePresence, motion } from "framer-motion";
 import { CreateSuggestionModal } from "./create-suggestion-modal";
 import { Suggestion } from "./suggestion";
+import { type PaginationState } from "@tanstack/react-table";
+import { SuggestionsEmptyState } from "./suggestions-empty-state";
+import { api } from "~/trpc/react";
+import { useParams } from "next/navigation";
 
 interface PublicBoardProps {
-  readonly board: RouterOutput["boards"]["getPublicBoardData"]["board"];
-  readonly suggestions: RouterOutput["boards"]["getPublicBoardData"]["suggestions"];
+  readonly board: RouterOutput["boards"]["getBoardData"]["board"];
+  readonly initialSuggestions: RouterOutput["suggestions"]["get"];
   readonly isPreview: boolean;
   readonly themeCSS?: string;
 }
 
 export const PublicBoard = memo(
-  ({ board, suggestions, isPreview, themeCSS = "" }: PublicBoardProps) => {
-    const session = useSession();
-    const signInRedirectSearchParams = new URLSearchParams({
-      targetHostName:
-        typeof window === "undefined" ? "" : window.location.hostname,
+  ({
+    board,
+    initialSuggestions,
+    isPreview,
+    themeCSS = "",
+  }: PublicBoardProps) => {
+    const [pagination, setPagination] = useState<PaginationState>({
+      pageIndex: 0,
+      pageSize: PAGE_SIZE,
     });
+
+    const params = useParams();
+    const suggestions = api.suggestions.get.useQuery(
+      {
+        pageSize: pagination.pageSize,
+        page: pagination.pageIndex,
+        slug: String(params.slug),
+      },
+      {
+        keepPreviousData: true,
+        initialData: initialSuggestions,
+      },
+    ).data;
+
+    const session = useSession();
 
     if (!board) {
       return null;
@@ -46,7 +69,7 @@ export const PublicBoard = memo(
           <header className="flex w-full flex-row items-center justify-between gap-4 rounded-lg border border-border bg-card p-4">
             <h1 className="text-2xl font-bold">{board.name}</h1>
             <div className="flex items-center gap-4">
-              {suggestions.length > 0 ? (
+              {suggestions?.length > 0 ? (
                 <CreateSuggestionModal
                   isPreview={isPreview}
                   boardId={board.id}
@@ -77,7 +100,14 @@ export const PublicBoard = memo(
 
               {session.status === "unauthenticated" ? (
                 <Link
-                  href={`${process.env.NODE_ENV === "production" ? SITE_URL : ""}/auth/signin?${signInRedirectSearchParams.toString()}`}
+                  href={`${process.env.NODE_ENV === "production" ? SITE_URL : ""}/auth/signin?${new URLSearchParams(
+                    {
+                      targetHostName:
+                        typeof window === "undefined"
+                          ? ""
+                          : window.location.hostname,
+                    },
+                  ).toString()}`}
                 >
                   <Button variant={"default"}>Sign in</Button>
                 </Link>
@@ -86,57 +116,11 @@ export const PublicBoard = memo(
           </header>
 
           <div className="w-full">
-            {suggestions.length === 0 ? (
-              <div className="mt-8 flex min-h-72 flex-col items-center justify-start gap-4">
-                <strong className="text-xl font-bold">
-                  No suggestions yet
-                </strong>
-                <p className="text-balance text-center text-sm">
-                  Let your voice be heard! Create the first suggestion.
-                </p>
-
-                <CreateSuggestionModal
-                  isPreview={isPreview}
-                  isCta={true}
-                  boardId={board.id}
-                />
-
-                <AnimatePresence>
-                  {session.status === "unauthenticated" ? (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.16 }}
-                    >
-                      <Link
-                        href={`${process.env.NODE_ENV === "production" ? SITE_URL : ""}/auth/signin?${signInRedirectSearchParams.toString()}`}
-                      >
-                        <Button variant={"default"}>Sign in</Button>
-                      </Link>
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
-              </div>
+            {suggestions?.length === 0 ? (
+              <SuggestionsEmptyState boardId={board.id} isPreview={isPreview} />
             ) : (
-              <motion.ul
-                className="flex w-full flex-col"
-                variants={{
-                  hidden: {
-                    x: "-100vw",
-                  },
-                  visible: {
-                    x: 0,
-                    transition: {
-                      when: "beforeChildren",
-                      staggerChildren: 0.2,
-                    },
-                  },
-                }}
-                animate="visible"
-                initial="hidden"
-              >
-                {suggestions.map((suggestion) => (
+              <ul className="flex w-full flex-col">
+                {suggestions?.map((suggestion) => (
                   <Suggestion
                     key={suggestion.id}
                     suggestion={suggestion}
@@ -144,16 +128,58 @@ export const PublicBoard = memo(
                     boardId={board.id}
                   />
                 ))}
-              </motion.ul>
+              </ul>
             )}
           </div>
 
-          <Link href={SITE_URL} passHref target="_blank" className="self-end">
-            <Button variant={"ghost"} size={"sm"} className="opacity-70">
-              Powered by
-              <strong className="ml-1">Suggestli</strong>
+          <footer className="flex w-full flex-row items-center justify-between gap-4">
+            <Button
+              variant={"ghost"}
+              size={"sm"}
+              className="block h-min py-1 opacity-70"
+              asChild
+            >
+              <Link href={SITE_URL} target="_blank" passHref>
+                Powered by
+                <strong className="ml-1">Suggestli</strong>
+              </Link>
             </Button>
-          </Link>
+
+            <div className="flex items-center justify-end space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setPagination((prev) => ({
+                    ...prev,
+                    pageIndex: Math.max(prev.pageIndex - 1, 0),
+                  }))
+                }
+                disabled={pagination.pageIndex === 0}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setPagination((prev) => ({
+                    ...prev,
+                    pageIndex: Math.min(
+                      prev.pageIndex + 1,
+                      Math.ceil(board.suggestionsCount / prev.pageSize) - 1,
+                    ),
+                  }))
+                }
+                disabled={
+                  pagination.pageIndex ===
+                  Math.ceil(board.suggestionsCount / pagination.pageSize) - 1
+                }
+              >
+                Next
+              </Button>
+            </div>
+          </footer>
         </main>
       </>
     );

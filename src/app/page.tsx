@@ -22,14 +22,19 @@ export default async function Home() {
     isSubdomain &&
     process.env.VERCEL_ENV === "production"
   ) {
-    const boardData = await api.boards.getPublicBoardData.query({
-      slug: firstPartOfHostName,
-      page: 0,
-    });
+    const [boardData, initialSuggestions] = await Promise.all([
+      api.boards.getBoardData.query({
+        slug: firstPartOfHostName,
+      }),
+      api.suggestions.get.query({
+        slug: firstPartOfHostName,
+        page: 0,
+      }),
+    ]);
 
     return (
       <PublicBoard
-        suggestions={boardData.suggestions}
+        initialSuggestions={initialSuggestions}
         board={boardData.board}
         isPreview={false}
         themeCSS={boardData.board?.themeCSS ?? ""}

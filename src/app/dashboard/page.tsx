@@ -48,7 +48,7 @@ export default async function Dashboard({ searchParams }: DashboardProps) {
     redirect("/auth/signin");
   }
 
-  const userBoards = await api.boards.getAll.query();
+  const userBoards = await api.boards.getUserBoards.query();
 
   return (
     <>

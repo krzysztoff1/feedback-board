@@ -10,6 +10,7 @@
     "db:migrate": "drizzle-kit generate:pg",
     "dev": "next dev",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "start": "next start"
   },
   "dependencies": {

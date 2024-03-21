@@ -114,8 +114,8 @@ export const BoardCustomizer = memo(({ theme, board }: SelectThemeProps) => {
 
       <div className="">
         <PublicBoard
-          suggestions={EXAMPLE_SUGGESTIONS}
-          board={board}
+          initialSuggestions={EXAMPLE_SUGGESTIONS}
+          board={{ ...board, suggestionsCount: EXAMPLE_SUGGESTIONS.length }}
           themeCSS={convertThemeToCssString({
             theme: boardThemes.find((t) => t.name === form.watch("name"))!,
             selector: `.board-main`,

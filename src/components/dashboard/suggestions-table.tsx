@@ -21,6 +21,7 @@ import { Button } from "../ui/button";
 import { api } from "~/trpc/react";
 import { useParams } from "next/navigation";
 import { Skeleton } from "../ui/skeleton";
+import { PAGE_SIZE } from "~/lib/constants";
 
 type Row = RouterOutput["suggestions"]["get"][number];
 
@@ -61,7 +62,7 @@ export const SuggestionTable = memo(
     const { slug } = useParams();
     const [pagination, setPagination] = useState<PaginationState>({
       pageIndex: 0,
-      pageSize: 10,
+      pageSize: PAGE_SIZE,
     });
 
     const suggestions = api.suggestions.get.useQuery({

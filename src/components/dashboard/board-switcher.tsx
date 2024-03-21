@@ -14,7 +14,7 @@ import { api } from "~/trpc/react";
 
 export const BoardSwitcher = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
-  const boards = api.boards.getAll.useQuery().data ?? [];
+  const boards = api.boards.getUserBoards.useQuery().data ?? [];
   const params = useParams();
   const board = boards.find((board) => board.slug === params.slug);
 
