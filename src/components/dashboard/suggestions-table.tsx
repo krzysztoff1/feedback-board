@@ -149,6 +149,7 @@ export const SuggestionTable = memo(
     return (
       <div>
         <div className="flex items-center py-4">
+          <h2 className="text-xl font-bold">Suggestions</h2>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
