@@ -64,7 +64,7 @@ export const suggestionsRouter = createTRPCRouter({
       });
       const boardId = board?.id ?? -1;
 
-      if (!board || board.createdById !== uid) {
+      if (!board) {
         return [];
       }
 

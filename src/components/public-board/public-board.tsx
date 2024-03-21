@@ -34,7 +34,7 @@ export const PublicBoard = memo(
       pageIndex: 0,
       pageSize: PAGE_SIZE,
     });
-
+    const session = useSession();
     const params = useParams();
     const suggestions = api.suggestions.get.useQuery(
       {
@@ -47,8 +47,6 @@ export const PublicBoard = memo(
         initialData: initialSuggestions,
       },
     ).data;
-
-    const session = useSession();
 
     if (!board) {
       return null;
