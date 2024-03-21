@@ -35,12 +35,11 @@ export const PublicBoard = memo(
       pageSize: PAGE_SIZE,
     });
     const session = useSession();
-    const params = useParams();
     const suggestions = api.suggestions.get.useQuery(
       {
         pageSize: pagination.pageSize,
         page: pagination.pageIndex,
-        slug: String(params.slug),
+        slug: board?.slug ?? "",
       },
       {
         keepPreviousData: true,
@@ -130,7 +129,7 @@ export const PublicBoard = memo(
             )}
           </div>
 
-          <footer className="mb-40 flex w-full flex-row items-center justify-between gap-4">
+          <footer className="mb-40 flex w-full flex-row items-center justify-between gap-4 p-4">
             <span className="block h-min py-1 text-sm opacity-70">
               Viewing {pagination.pageIndex * pagination.pageSize + 1}–
               {Math.min(
