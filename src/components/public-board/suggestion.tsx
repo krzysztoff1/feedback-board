@@ -1,5 +1,5 @@
 import type { RouterOutput } from "~/server/api/root";
-import { ArrowBigUp, Dot } from "lucide-react";
+import { ChevronUp, ChevronsUp, Dot } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { memo } from "react";
 import { cn, getRelativeTimeString, throttle, truncate } from "~/lib/utils";
@@ -43,7 +43,7 @@ export const Suggestion = memo(
         suggestionId: suggestion.id,
         boardId,
       });
-    }, 250);
+    }, 100);
 
     return (
       <li
@@ -57,23 +57,33 @@ export const Suggestion = memo(
         <div className="p-2">
           <button
             onClick={handleUpVote}
-            className="flex flex-col items-center justify-center gap-1 rounded-lg p-2 hover:bg-secondary"
+            className={cn(
+              "flex translate-y-2 flex-col items-center justify-center gap-1 rounded-lg p-2",
+              { "hover:bg-primary/5": session.status === "authenticated" },
+            )}
           >
-            <ArrowBigUp
-              size={18}
-              className={cn(
-                "upvote-icon transition-transform hover:scale-105",
-                { "text-primary": suggestion.isUpVoted },
-              )}
-              fill={suggestion.isUpVoted ? "currentColor" : undefined}
-            />
+            {suggestion.isUpVoted ? (
+              <ChevronsUp
+                size={18}
+                className={cn("upvote-icon text-primary transition-transform", {
+                  "hover:scale-105": session.status === "authenticated",
+                })}
+              />
+            ) : (
+              <ChevronUp
+                size={18}
+                className={cn("upvote-icon transition-transform", {
+                  "hover:scale-105": session.status === "authenticated",
+                })}
+              />
+            )}
             <span className="upvote-counter block text-sm">
               {suggestion.upVotes}
             </span>
           </button>
         </div>
         <div className="flex w-full flex-col pb-4 pr-4 pt-4">
-          <strong className="block text-lg text-primary">
+          <strong className="mb-1 block text-lg text-primary">
             {suggestion.title}
           </strong>
           <p className="block text-base">{truncate(suggestion.content)}</p>
