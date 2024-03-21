@@ -131,19 +131,25 @@ export const PublicBoard = memo(
           </div>
 
           <footer className="flex w-full flex-row items-center justify-between gap-4">
-            <Button
-              variant={"ghost"}
-              size={"sm"}
-              className="block h-min py-1 opacity-70"
-              asChild
-            >
+            <span className="block h-min py-1 text-sm opacity-70">
+              Viewing {pagination.pageIndex * pagination.pageSize + 1}–
+              {Math.min(
+                (pagination.pageIndex + 1) * pagination.pageSize,
+                board.suggestionsCount,
+              )}{" "}
+              of {board.suggestionsCount} results
+              <br />
               <Link href={SITE_URL} target="_blank" passHref>
                 Powered by
                 <strong className="ml-1">Suggestli</strong>
               </Link>
-            </Button>
+            </span>
 
-            <div className="flex items-center justify-end space-x-2">
+            <div
+              className={cn("flex items-center justify-end space-x-2", {
+                hidden: board.suggestionsCount <= pagination.pageSize,
+              })}
+            >
               <Button
                 variant="outline"
                 size="sm"
