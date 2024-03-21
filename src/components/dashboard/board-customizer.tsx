@@ -72,7 +72,7 @@ export const BoardCustomizer = memo(({ theme, board }: SelectThemeProps) => {
 
   return (
     <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-      <div className="rounded-lg border p-4">
+      <div className="h-min rounded-lg border p-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormItem>
@@ -112,10 +112,10 @@ export const BoardCustomizer = memo(({ theme, board }: SelectThemeProps) => {
         </Form>
       </div>
 
-      <div className="">
+      <div>
         <PublicBoard
-          suggestions={EXAMPLE_SUGGESTIONS}
-          board={board}
+          initialSuggestions={EXAMPLE_SUGGESTIONS}
+          board={{ ...board, suggestionsCount: EXAMPLE_SUGGESTIONS.length }}
           themeCSS={convertThemeToCssString({
             theme: boardThemes.find((t) => t.name === form.watch("name"))!,
             selector: `.board-main`,

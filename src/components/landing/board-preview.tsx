@@ -19,7 +19,7 @@ export const BoardPreview = memo(() => {
 
       <div className="relative mt-12 w-full max-w-4xl shadow-primary">
         <PublicBoard
-          suggestions={EXAMPLE_SUGGESTIONS}
+          initialSuggestions={EXAMPLE_SUGGESTIONS}
           board={{
             id: 1,
             name: "My board",
@@ -30,6 +30,7 @@ export const BoardPreview = memo(() => {
             createdById: "1",
             ownerId: "1",
             theme: null,
+            suggestionsCount: EXAMPLE_SUGGESTIONS.length,
           }}
           isPreview={true}
         />

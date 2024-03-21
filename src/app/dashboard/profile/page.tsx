@@ -7,7 +7,7 @@ export default async function Profile() {
   return (
     <>
       <h1 className="mb-8 text-2xl font-bold">Profile</h1>
-      <div className="rounded-lg border p-4">
+      <div className="h-min rounded-lg border p-4">
         <EditNameForm name={session?.user?.name ?? ""} />
       </div>
     </>
