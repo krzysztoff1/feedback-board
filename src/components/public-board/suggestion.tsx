@@ -49,9 +49,9 @@ export const Suggestion = memo(
       <li
         id={`suggestion-${suggestion.id}`}
         className={cn(
-          "flex border-x border-t border-border bg-card",
-          "first:rounded-t-lg",
-          "last:rounded-b-lg last:border-b",
+          "flex bg-card sm:border-x sm:border-t sm:border-border",
+          "sm:first:rounded-t-lg",
+          "sm:last:rounded-b-lg sm:last:border-b",
         )}
       >
         <div className="p-2">

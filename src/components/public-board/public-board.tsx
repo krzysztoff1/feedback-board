@@ -64,7 +64,7 @@ export const PublicBoard = memo(
             { "sm:my-8 md:my-16": !isPreview },
           )}
         >
-          <header className="flex w-full flex-row items-center justify-between gap-4 rounded-lg border border-border bg-card p-4">
+          <header className="flex w-full flex-row items-center justify-between gap-4 border-border bg-card p-4 sm:rounded-lg sm:border">
             <h1 className="text-2xl font-bold">{board.name}</h1>
             <div className="flex items-center gap-4">
               {suggestions?.length > 0 ? (
@@ -130,7 +130,7 @@ export const PublicBoard = memo(
             )}
           </div>
 
-          <footer className="flex w-full flex-row items-center justify-between gap-4">
+          <footer className="mb-40 flex w-full flex-row items-center justify-between gap-4">
             <span className="block h-min py-1 text-sm opacity-70">
               Viewing {pagination.pageIndex * pagination.pageSize + 1}–
               {Math.min(

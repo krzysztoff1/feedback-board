@@ -1,4 +1,4 @@
-import { and, eq, count, desc } from "drizzle-orm";
+import { and, eq, count, desc, asc, AnyColumn } from "drizzle-orm";
 import { z } from "zod";
 import { PAGE_SIZE } from "~/lib/constants";
 import {
@@ -53,6 +53,10 @@ export const suggestionsRouter = createTRPCRouter({
         slug: z.string(),
         page: z.number(),
         pageSize: z.number().min(1).max(100).optional().default(PAGE_SIZE),
+        sorting: z
+          .object({ desc: z.boolean(), id: z.string() })
+          .optional()
+          .default({ desc: true, id: "createdAt" }),
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -68,12 +72,25 @@ export const suggestionsRouter = createTRPCRouter({
         return [];
       }
 
+      let orderByColumn: AnyColumn = suggestions.createdAt;
+
+      switch (input.sorting.id) {
+        case "createdAt":
+          orderByColumn = suggestions.createdAt;
+          break;
+        case "upVotes":
+          orderByColumn = suggestions.upVotes;
+          break;
+      }
+
       const [targetSuggestions, userUpVotes] = await Promise.all([
         ctx.db
           .select()
           .from(suggestions)
           .leftJoin(users, eq(suggestions.createdBy, users.id))
-          .orderBy(desc(suggestions.createdAt))
+          .orderBy(
+            input.sorting.desc ? desc(orderByColumn) : asc(orderByColumn),
+          )
           .where(eq(suggestions.boardId, boardId))
           .limit(input.pageSize)
           .offset(input.page * input.pageSize),
