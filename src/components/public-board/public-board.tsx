@@ -14,7 +14,6 @@ import { Suggestion } from "./suggestion";
 import { type PaginationState } from "@tanstack/react-table";
 import { SuggestionsEmptyState } from "./suggestions-empty-state";
 import { api } from "~/trpc/react";
-import { useParams } from "next/navigation";
 
 interface PublicBoardProps {
   readonly board: RouterOutput["boards"]["getBoardData"]["board"];
@@ -129,7 +128,7 @@ export const PublicBoard = memo(
             )}
           </div>
 
-          <footer className="mb-40 flex w-full flex-row items-center justify-between gap-4 p-4">
+          <footer className="mb-40 flex w-full flex-row items-center justify-between gap-4 px-4">
             <span className="block h-min py-1 text-sm opacity-70">
               Viewing {pagination.pageIndex * pagination.pageSize + 1}–
               {Math.min(
