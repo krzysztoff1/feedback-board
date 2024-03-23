@@ -62,7 +62,12 @@ export const PublicBoard = memo(
             { "sm:my-8 md:my-16": !isPreview },
           )}
         >
-          <header className="flex w-full flex-row items-start justify-between gap-4 border-b border-border bg-card p-4 sm:rounded-lg sm:border-b-transparent">
+          <header
+            className={cn(
+              "flex w-full flex-row items-start justify-between gap-4 border-border bg-card p-4",
+              "border-b sm:rounded-lg sm:border",
+            )}
+          >
             <div className="flex w-full flex-col gap-4">
               <h1 className="text-3xl font-bold">{board.name}</h1>
               <article
