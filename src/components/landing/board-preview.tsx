@@ -31,6 +31,7 @@ export const BoardPreview = memo(() => {
             ownerId: "1",
             theme: null,
             suggestionsCount: EXAMPLE_SUGGESTIONS.length,
+            description: `<p>My board description</p>`,
           }}
           isPreview={true}
         />
