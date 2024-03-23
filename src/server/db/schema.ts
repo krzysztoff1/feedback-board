@@ -27,6 +27,7 @@ export const boards = createTable(
   {
     id: serial("id").primaryKey(),
     name: varchar("name", { length: 256 }),
+    description: text("description").default("").notNull(),
     slug: varchar("slug", { length: 256 }).unique(),
     createdById: varchar("createdById", { length: 255 })
       .notNull()

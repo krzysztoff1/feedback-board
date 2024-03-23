@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { EditBoardDescriptionForm } from "~/components/dashboard/edit-board-description-form";
 import { EditBoardNameForm } from "~/components/dashboard/edit-board-name-form";
 import { Button } from "~/components/ui/button";
 import { SITE_URL } from "~/lib/constants";
@@ -25,7 +26,7 @@ export default async function Customize({ params }: CustomizeProps) {
   return (
     <div>
       <header className="mb-8 flex items-center justify-between">
-        <h1 className="block text-2xl font-bold">Customize {board.name}</h1>
+        <h1 className="block text-2xl font-bold">Edit {board.name}</h1>
 
         <Link
           href={
@@ -39,8 +40,14 @@ export default async function Customize({ params }: CustomizeProps) {
         </Link>
       </header>
 
-      <div className="h-min rounded-lg border p-4">
-        <EditBoardNameForm board={board} />
+      <div className="flex flex-col space-y-4">
+        <div className="h-min rounded-lg border p-4">
+          <EditBoardNameForm board={board} />
+        </div>
+
+        <div className="h-min rounded-lg border p-4">
+          <EditBoardDescriptionForm board={board} />
+        </div>
       </div>
     </div>
   );

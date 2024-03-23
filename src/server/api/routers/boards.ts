@@ -79,6 +79,7 @@ export const boardsRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string().min(1).max(256).optional(),
+        description: z.string().min(1).max(5000).optional(),
         id: z.number(),
       }),
     )
@@ -91,9 +92,7 @@ export const boardsRouter = createTRPCRouter({
           promises.push(
             ctx.db
               .update(boards)
-              .set({
-                [key]: value,
-              })
+              .set({ [key]: value })
               .where(and(eq(boards.ownerId, uid), eq(boards.id, input.id))),
           );
         }
