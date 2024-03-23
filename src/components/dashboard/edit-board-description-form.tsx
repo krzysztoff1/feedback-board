@@ -19,7 +19,7 @@ import { Loader } from "lucide-react";
 import { TipTap } from "./tiptap";
 
 const formSchema = z.object({
-  description: z.string().min(1).max(500),
+  description: z.string().min(1).max(5000),
 });
 
 interface EditBoardDescriptionFormProps {
@@ -34,11 +34,7 @@ export const EditBoardDescriptionForm = memo(
         description: board?.description,
       },
     });
-    const editBoardDescriptionHandler = api.boards.edit.useMutation({
-      onSettled: () => {
-        form.reset();
-      },
-    });
+    const editBoardDescriptionHandler = api.boards.edit.useMutation();
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
       try {

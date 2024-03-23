@@ -34,11 +34,7 @@ export const EditBoardNameForm = memo(({ board }: EditBoardNameFormProps) => {
       name: board?.name ?? "",
     },
   });
-  const createBoardHandler = api.boards.edit.useMutation({
-    onSettled: () => {
-      form.reset();
-    },
-  });
+  const createBoardHandler = api.boards.edit.useMutation();
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
