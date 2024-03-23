@@ -255,7 +255,7 @@ export const SuggestionTable = memo(
         <div className="flex w-full items-center justify-between">
           <div>
             <span className="block h-min py-1 text-sm opacity-70">
-              Viewing {pagination.pageIndex * pagination.pageSize + 1} -{" "}
+              Viewing {pagination.pageIndex * pagination.pageSize + 1}-
               {Math.min(
                 (pagination.pageIndex + 1) * pagination.pageSize,
                 totalSuggestionsCount,

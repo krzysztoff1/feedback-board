@@ -14,7 +14,6 @@ import { Suggestion } from "./suggestion";
 import { type PaginationState } from "@tanstack/react-table";
 import { SuggestionsEmptyState } from "./suggestions-empty-state";
 import { api } from "~/trpc/react";
-import { useParams } from "next/navigation";
 
 interface PublicBoardProps {
   readonly board: RouterOutput["boards"]["getBoardData"]["board"];
@@ -63,8 +62,19 @@ export const PublicBoard = memo(
             { "sm:my-8 md:my-16": !isPreview },
           )}
         >
-          <header className="flex w-full flex-row items-center justify-between gap-4 border-border bg-card p-4 sm:rounded-lg sm:border">
-            <h1 className="text-2xl font-bold">{board.name}</h1>
+          <header
+            className={cn(
+              "flex w-full flex-row items-start justify-between gap-4 border-border bg-card p-4",
+              "border-b sm:rounded-lg sm:border",
+            )}
+          >
+            <div className="flex w-full flex-col gap-4">
+              <h1 className="text-3xl font-bold">{board.name}</h1>
+              <article
+                className="prose prose-gray w-full"
+                dangerouslySetInnerHTML={{ __html: board.description }}
+              />
+            </div>
             <div className="flex items-center gap-4">
               {suggestions?.length > 0 ? (
                 <CreateSuggestionModal
@@ -129,7 +139,7 @@ export const PublicBoard = memo(
             )}
           </div>
 
-          <footer className="mb-40 flex w-full flex-row items-center justify-between gap-4 p-4">
+          <footer className="mb-40 flex w-full flex-row items-center justify-between gap-4 px-4">
             <span className="block h-min py-1 text-sm opacity-70">
               Viewing {pagination.pageIndex * pagination.pageSize + 1}–
               {Math.min(

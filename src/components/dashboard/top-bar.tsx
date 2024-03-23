@@ -21,10 +21,7 @@ export const TopBar = memo(() => {
     <header className="sticky top-0 z-50 flex h-16 w-screen border-b border-border bg-background">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center space-x-2">
-          <Link
-            href="/dashboard"
-            className="text-2xl font-bold text-foreground"
-          >
+          <Link href="/dashboard" className="text-2xl font-bold text-primary">
             Suggestli
           </Link>
           <BoardSwitcher />

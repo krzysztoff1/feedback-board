@@ -106,6 +106,7 @@ export const CreateBoardForm = memo(
             slug: convertToSlug(values.slug),
             theme: null,
             themeCSS: "",
+            description: "",
           },
         ]);
       } catch (error) {

@@ -1,0 +1,86 @@
+"use client";
+
+import { memo } from "react";
+import type { RouterOutput } from "~/server/api/root";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "~/components/ui/button";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+  Form,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import { api } from "~/trpc/react";
+import { Loader } from "lucide-react";
+
+const formSchema = z.object({
+  name: z.string().min(1).max(256),
+});
+
+interface EditBoardNameFormProps {
+  readonly board: RouterOutput["boards"]["get"];
+}
+
+export const EditBoardNameForm = memo(({ board }: EditBoardNameFormProps) => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: board?.name ?? "",
+    },
+  });
+  const createBoardHandler = api.boards.edit.useMutation();
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      if (!board) {
+        return;
+      }
+
+      await createBoardHandler.mutateAsync({
+        id: board.id,
+        ...values,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder="John Doe" {...field} />
+              </FormControl>
+              <FormDescription>Public name of the board.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? (
+            <>
+              <Loader className="mr-2 animate-spin" size={16} />
+              Saving...
+            </>
+          ) : (
+            "Save"
+          )}
+        </Button>
+      </form>
+    </Form>
+  );
+});
+
+EditBoardNameForm.displayName = "EditBoardNameForm";
