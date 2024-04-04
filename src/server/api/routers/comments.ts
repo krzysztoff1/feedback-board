@@ -1,4 +1,4 @@
-import { eq, desc, asc } from "drizzle-orm";
+import { eq, desc, asc, and } from "drizzle-orm";
 import { z } from "zod";
 import { PAGE_SIZE } from "~/lib/constants";
 import {
@@ -60,6 +60,49 @@ export const commentsRouter = createTRPCRouter({
           name: user?.name,
           image: user?.image,
         },
+      }));
+    }),
+
+  infinite: publicProcedure
+    .input(
+      z.object({
+        boardId: z.number(),
+        suggestionId: z.number(),
+        limit: z.number().min(1).max(100).optional().default(PAGE_SIZE),
+        cursor: z.number(),
+        sorting: z
+          .object({ desc: z.boolean(), id: z.string() })
+          .optional()
+          .default({ desc: true, id: "createdAt" }),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const orderByColumn = comments.createdAt;
+      const queryResult = await ctx.db
+        .select()
+        .from(comments)
+        .leftJoin(users, eq(comments.createdBy, users.id))
+        .orderBy(input.sorting.desc ? desc(orderByColumn) : asc(orderByColumn))
+        .where(
+          and(
+            eq(comments.boardId, input.boardId),
+            eq(comments.suggestionId, input.suggestionId),
+          ),
+        )
+        .limit(input.limit)
+        .offset(input.cursor);
+
+      return queryResult.map(({ Comments, user }) => ({
+        id: Comments.id,
+        content: Comments.content,
+        createdBy: user?.name,
+        createdAt: Comments.createdAt,
+        user: {
+          id: user?.id,
+          name: user?.name,
+          image: user?.image,
+        },
+        nextCursor: input.cursor + input.limit,
       }));
     }),
 });

@@ -3,6 +3,7 @@ import type { RouterOutput } from "~/server/api/root";
 import { CreateCommmentForm } from "./create-comment-form";
 import { api } from "~/trpc/react";
 import { Comment } from "./comment";
+import { Button } from "../ui/button";
 
 interface SuggestionDrawerContentProps {
   readonly boardId: number;
@@ -11,10 +12,19 @@ interface SuggestionDrawerContentProps {
 
 export const SuggestionDrawerContent = memo(
   ({ boardId, suggestion }: SuggestionDrawerContentProps) => {
-    const comments = api.comments.get.useQuery({
-      boardId,
-      page: 0,
-    });
+    const commentsQuery = api.comments.infinite.useInfiniteQuery(
+      {
+        boardId,
+        limit: 3,
+        suggestionId: suggestion.id,
+        sorting: { desc: true, id: "createdAt" },
+      },
+      {
+        getNextPageParam: (lastPage) =>
+          lastPage?.[lastPage.length - 1]?.nextCursor,
+        initialCursor: 0,
+      },
+    );
 
     return (
       <div className="p-4">
@@ -24,16 +34,33 @@ export const SuggestionDrawerContent = memo(
           <span className="text-sm text-foreground/50">Content</span>
           <article className="prose prose-gray">{suggestion.content}</article>
         </div>
+
         <CreateCommmentForm
           suggestionId={suggestion.id}
           boardId={boardId}
-          onSubmission={() => comments.refetch()}
+          onSubmission={() => commentsQuery.refetch()}
         />
-        <ul className="mt-4 space-y-8">
-          {comments.data?.map((comment) => (
-            <Comment key={comment.id} comment={comment} />
-          ))}
+
+        <ul className="mt-8 space-y-8">
+          {commentsQuery.data?.pages
+            .flatMap((page) => page)
+            .map((comment) => <Comment key={comment.id} comment={comment} />)}
         </ul>
+
+        <div className="mt-4 flex w-full items-center justify-center">
+          <Button
+            onClick={async () => {
+              await commentsQuery.fetchNextPage();
+            }}
+            disabled={
+              commentsQuery.isFetchingNextPage || !commentsQuery.hasNextPage
+            }
+            className="mt-4"
+            variant={"outline"}
+          >
+            Load more
+          </Button>
+        </div>
       </div>
     );
   },
