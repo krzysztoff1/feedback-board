@@ -100,6 +100,8 @@ export const comments = createTable(
   }),
 );
 
+export const activityTypeEnum = pgEnum("activityType", ["statusChange"]);
+
 export const suggestionActivity = createTable(
   "suggestionActivity",
   {
@@ -113,7 +115,7 @@ export const suggestionActivity = createTable(
     userId: varchar("userId", { length: 255 })
       .notNull()
       .references(() => users.id),
-    type: pgEnum("type", ["statusChange"])("type").notNull(),
+    type: activityTypeEnum("type").notNull(),
     content: text("content"),
     createdAt: timestamp("created_at")
       .default(sql`CURRENT_TIMESTAMP`)
