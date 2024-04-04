@@ -4,6 +4,12 @@ import { CreateCommmentForm } from "./create-comment-form";
 import { api } from "~/trpc/react";
 import { Comment } from "./comment";
 import { Button } from "../ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../ui/collapsible";
+import { ChevronsUpDown } from "lucide-react";
 
 interface SuggestionDrawerContentProps {
   readonly boardId: number;
@@ -35,11 +41,30 @@ export const SuggestionDrawerContent = memo(
           <article className="prose prose-gray">{suggestion.content}</article>
         </div>
 
-        <CreateCommmentForm
-          suggestionId={suggestion.id}
-          boardId={boardId}
-          onSubmission={() => commentsQuery.refetch()}
-        />
+        <hr className="my-4" />
+
+        <Collapsible>
+          <div className="flex items-center justify-between space-x-4">
+            <h4 className="text-sm font-semibold">
+              Comment on this suggestion
+            </h4>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <ChevronsUpDown size={16} className="h-4 w-4" />
+                <span className="sr-only">Toggle</span>
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent className="my-2 rounded-lg border p-4">
+            <CreateCommmentForm
+              suggestionId={suggestion.id}
+              boardId={boardId}
+              onSubmission={() => commentsQuery.refetch()}
+            />
+          </CollapsibleContent>
+        </Collapsible>
+
+        <hr className="my-4" />
 
         <ul className="mt-8 space-y-8">
           {commentsQuery.data?.pages
