@@ -2,7 +2,7 @@ import { memo } from "react";
 import type { RouterOutput } from "~/server/api/root";
 import { CreateCommmentForm } from "./create-comment-form";
 import { api } from "~/trpc/react";
-import { getRelativeTimeString } from "~/lib/utils";
+import { Comment } from "./comment";
 
 interface SuggestionDrawerContentProps {
   readonly boardId: number;
@@ -29,13 +29,9 @@ export const SuggestionDrawerContent = memo(
           boardId={boardId}
           onSubmission={() => comments.refetch()}
         />
-        <ul className="mt-4 space-y-4">
+        <ul className="mt-4 space-y-8">
           {comments.data?.map((comment) => (
-            <li key={comment.id}>
-              <article className="prose prose-gray">{comment.content}</article>
-              <span className="text-sm">{comment.user.name}</span>-
-              <span>{getRelativeTimeString(comment.createdAt, "en-US")}</span>
-            </li>
+            <Comment key={comment.id} comment={comment} />
           ))}
         </ul>
       </div>
