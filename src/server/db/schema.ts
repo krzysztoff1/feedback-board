@@ -3,6 +3,7 @@ import {
   index,
   integer,
   json,
+  pgEnum,
   pgTableCreator,
   primaryKey,
   serial,
@@ -70,6 +71,32 @@ export const suggestions = createTable(
   (example) => ({
     boardIdIdx: index("boardId_idx").on(example.boardId),
     createdByIdx: index("createdBy_idx").on(example.createdBy),
+  }),
+);
+
+export const comments = createTable(
+  "Comments",
+  {
+    id: serial("id").primaryKey(),
+    boardId: integer("boardId")
+      .notNull()
+      .references(() => boards.id),
+    suggestionId: integer("suggestionId")
+      .notNull()
+      .references(() => suggestions.id),
+    createdBy: varchar("createdBy", { length: 255 })
+      .notNull()
+      .references(() => users.id),
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at")
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updatedAt"),
+  },
+  (example) => ({
+    boardIdIdx: index("comment_boardId_idx").on(example.boardId),
+    suggestionIdIdx: index("comment_suggestionId_idx").on(example.suggestionId),
+    userIdIdx: index("comment_userId_idx").on(example.createdBy),
   }),
 );
 

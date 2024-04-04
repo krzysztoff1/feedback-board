@@ -1,0 +1,669 @@
+{
+  "id": "cce685cd-90e9-4a0c-93cd-3e33757ec4e3",
+  "prevId": "130c2d6e-863a-4d20-a2eb-e7597d8bea6c",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "feedback-board_account": {
+      "name": "feedback-board_account",
+      "schema": "",
+      "columns": {
+        "userId": {
+          "name": "userId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "providerAccountId": {
+          "name": "providerAccountId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "access_token": {
+          "name": "access_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "token_type": {
+          "name": "token_type",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "id_token": {
+          "name": "id_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "session_state": {
+          "name": "session_state",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "account_userId_idx": {
+          "name": "account_userId_idx",
+          "columns": [
+            "userId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "feedback-board_account_userId_feedback-board_user_id_fk": {
+          "name": "feedback-board_account_userId_feedback-board_user_id_fk",
+          "tableFrom": "feedback-board_account",
+          "tableTo": "feedback-board_user",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "feedback-board_account_provider_providerAccountId_pk": {
+          "name": "feedback-board_account_provider_providerAccountId_pk",
+          "columns": [
+            "provider",
+            "providerAccountId"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "feedback-board_boards": {
+      "name": "feedback-board_boards",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdById": {
+          "name": "createdById",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ownerId": {
+          "name": "ownerId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "theme": {
+          "name": "theme",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{\"name\":\"zinc\",\"label\":\"Zinc\",\"activeColor\":{\"light\":\"240 5.9% 10%\",\"dark\":\"240 5.2% 33.9%\"},\"cssVars\":{\"light\":{\"background\":\"0 0% 100%\",\"foreground\":\"240 10% 3.9%\",\"card\":\"0 0% 100%\",\"card-foreground\":\"240 10% 3.9%\",\"popover\":\"0 0% 100%\",\"popover-foreground\":\"240 10% 3.9%\",\"primary\":\"240 5.9% 10%\",\"primary-foreground\":\"0 0% 98%\",\"secondary\":\"240 4.8% 95.9%\",\"secondary-foreground\":\"240 5.9% 10%\",\"muted\":\"240 4.8% 95.9%\",\"muted-foreground\":\"240 3.8% 46.1%\",\"accent\":\"240 4.8% 95.9%\",\"accent-foreground\":\"240 5.9% 10%\",\"destructive\":\"0 84.2% 60.2%\",\"destructive-foreground\":\"0 0% 98%\",\"border\":\"240 5.9% 90%\",\"input\":\"240 5.9% 90%\",\"ring\":\"240 5.9% 10%\",\"radius\":\"0.5rem\"},\"dark\":{\"background\":\"240 10% 3.9%\",\"foreground\":\"0 0% 98%\",\"card\":\"240 10% 3.9%\",\"card-foreground\":\"0 0% 98%\",\"popover\":\"240 10% 3.9%\",\"popover-foreground\":\"0 0% 98%\",\"primary\":\"0 0% 98%\",\"primary-foreground\":\"240 5.9% 10%\",\"secondary\":\"240 3.7% 15.9%\",\"secondary-foreground\":\"0 0% 98%\",\"muted\":\"240 3.7% 15.9%\",\"muted-foreground\":\"240 5% 64.9%\",\"accent\":\"240 3.7% 15.9%\",\"accent-foreground\":\"0 0% 98%\",\"destructive\":\"0 62.8% 30.6%\",\"destructive-foreground\":\"0 0% 98%\",\"border\":\"240 3.7% 15.9%\",\"input\":\"240 3.7% 15.9%\",\"ring\":\"240 4.9% 83.9%\"}}}'::json"
+        },
+        "themeCSS": {
+          "name": "themeCSS",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "createdById_idx": {
+          "name": "createdById_idx",
+          "columns": [
+            "createdById"
+          ],
+          "isUnique": false
+        },
+        "name_idx": {
+          "name": "name_idx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        },
+        "ownerId_idx": {
+          "name": "ownerId_idx",
+          "columns": [
+            "ownerId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "feedback-board_boards_createdById_feedback-board_user_id_fk": {
+          "name": "feedback-board_boards_createdById_feedback-board_user_id_fk",
+          "tableFrom": "feedback-board_boards",
+          "tableTo": "feedback-board_user",
+          "columnsFrom": [
+            "createdById"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "feedback-board_boards_ownerId_feedback-board_user_id_fk": {
+          "name": "feedback-board_boards_ownerId_feedback-board_user_id_fk",
+          "tableFrom": "feedback-board_boards",
+          "tableTo": "feedback-board_user",
+          "columnsFrom": [
+            "ownerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "feedback-board_boards_slug_unique": {
+          "name": "feedback-board_boards_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      }
+    },
+    "feedback-board_Comments": {
+      "name": "feedback-board_Comments",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "boardId": {
+          "name": "boardId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "suggestionId": {
+          "name": "suggestionId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdBy": {
+          "name": "createdBy",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "comment_boardId_idx": {
+          "name": "comment_boardId_idx",
+          "columns": [
+            "boardId"
+          ],
+          "isUnique": false
+        },
+        "comment_suggestionId_idx": {
+          "name": "comment_suggestionId_idx",
+          "columns": [
+            "suggestionId"
+          ],
+          "isUnique": false
+        },
+        "comment_userId_idx": {
+          "name": "comment_userId_idx",
+          "columns": [
+            "createdBy"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "feedback-board_Comments_boardId_feedback-board_boards_id_fk": {
+          "name": "feedback-board_Comments_boardId_feedback-board_boards_id_fk",
+          "tableFrom": "feedback-board_Comments",
+          "tableTo": "feedback-board_boards",
+          "columnsFrom": [
+            "boardId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "feedback-board_Comments_suggestionId_feedback-board_suggestions_id_fk": {
+          "name": "feedback-board_Comments_suggestionId_feedback-board_suggestions_id_fk",
+          "tableFrom": "feedback-board_Comments",
+          "tableTo": "feedback-board_suggestions",
+          "columnsFrom": [
+            "suggestionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "feedback-board_Comments_createdBy_feedback-board_user_id_fk": {
+          "name": "feedback-board_Comments_createdBy_feedback-board_user_id_fk",
+          "tableFrom": "feedback-board_Comments",
+          "tableTo": "feedback-board_user",
+          "columnsFrom": [
+            "createdBy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "feedback-board_session": {
+      "name": "feedback-board_session",
+      "schema": "",
+      "columns": {
+        "sessionToken": {
+          "name": "sessionToken",
+          "type": "varchar(255)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires": {
+          "name": "expires",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "session_userId_idx": {
+          "name": "session_userId_idx",
+          "columns": [
+            "userId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "feedback-board_session_userId_feedback-board_user_id_fk": {
+          "name": "feedback-board_session_userId_feedback-board_user_id_fk",
+          "tableFrom": "feedback-board_session",
+          "tableTo": "feedback-board_user",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "feedback-board_suggestions": {
+      "name": "feedback-board_suggestions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "boardId": {
+          "name": "boardId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdBy": {
+          "name": "createdBy",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "upVotes": {
+          "name": "upVotes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        }
+      },
+      "indexes": {
+        "boardId_idx": {
+          "name": "boardId_idx",
+          "columns": [
+            "boardId"
+          ],
+          "isUnique": false
+        },
+        "createdBy_idx": {
+          "name": "createdBy_idx",
+          "columns": [
+            "createdBy"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "feedback-board_suggestions_boardId_feedback-board_boards_id_fk": {
+          "name": "feedback-board_suggestions_boardId_feedback-board_boards_id_fk",
+          "tableFrom": "feedback-board_suggestions",
+          "tableTo": "feedback-board_boards",
+          "columnsFrom": [
+            "boardId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "feedback-board_suggestions_createdBy_feedback-board_user_id_fk": {
+          "name": "feedback-board_suggestions_createdBy_feedback-board_user_id_fk",
+          "tableFrom": "feedback-board_suggestions",
+          "tableTo": "feedback-board_user",
+          "columnsFrom": [
+            "createdBy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "feedback-board_suggestionsUpVotes": {
+      "name": "feedback-board_suggestionsUpVotes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "boardId": {
+          "name": "boardId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "suggestionId": {
+          "name": "suggestionId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "feedback-board_suggestionsUpVotes_boardId_feedback-board_boards_id_fk": {
+          "name": "feedback-board_suggestionsUpVotes_boardId_feedback-board_boards_id_fk",
+          "tableFrom": "feedback-board_suggestionsUpVotes",
+          "tableTo": "feedback-board_boards",
+          "columnsFrom": [
+            "boardId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "feedback-board_suggestionsUpVotes_suggestionId_feedback-board_suggestions_id_fk": {
+          "name": "feedback-board_suggestionsUpVotes_suggestionId_feedback-board_suggestions_id_fk",
+          "tableFrom": "feedback-board_suggestionsUpVotes",
+          "tableTo": "feedback-board_suggestions",
+          "columnsFrom": [
+            "suggestionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "feedback-board_suggestionsUpVotes_userId_feedback-board_user_id_fk": {
+          "name": "feedback-board_suggestionsUpVotes_userId_feedback-board_user_id_fk",
+          "tableFrom": "feedback-board_suggestionsUpVotes",
+          "tableTo": "feedback-board_user",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "feedback-board_user": {
+      "name": "feedback-board_user",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(255)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "emailVerified": {
+          "name": "emailVerified",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "image": {
+          "name": "image",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "feedback-board_verificationToken": {
+      "name": "feedback-board_verificationToken",
+      "schema": "",
+      "columns": {
+        "identifier": {
+          "name": "identifier",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires": {
+          "name": "expires",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "feedback-board_verificationToken_identifier_token_pk": {
+          "name": "feedback-board_verificationToken_identifier_token_pk",
+          "columns": [
+            "identifier",
+            "token"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
