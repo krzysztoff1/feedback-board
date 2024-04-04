@@ -100,36 +100,6 @@ export const comments = createTable(
   }),
 );
 
-export const activityTypeEnum = pgEnum("activityType", ["statusChange"]);
-
-export const suggestionActivity = createTable(
-  "suggestionActivity",
-  {
-    id: serial("id").primaryKey(),
-    boardId: integer("boardId")
-      .notNull()
-      .references(() => boards.id),
-    suggestionId: integer("suggestionId")
-      .notNull()
-      .references(() => suggestions.id),
-    userId: varchar("userId", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    type: activityTypeEnum("type").notNull(),
-    content: text("content"),
-    createdAt: timestamp("created_at")
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-  },
-  (example) => ({
-    boardIdIdx: index("suggestionActivity_boardId_idx").on(example.boardId),
-    suggestionIdIdx: index("suggestionActivity_suggestionId_idx").on(
-      example.suggestionId,
-    ),
-    userIdIdx: index("suggestionActivity_userId_idx").on(example.userId),
-  }),
-);
-
 export const suggestionsUpVotes = createTable("suggestionsUpVotes", {
   id: serial("id").primaryKey(),
   boardId: integer("boardId")
