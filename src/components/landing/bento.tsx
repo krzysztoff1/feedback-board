@@ -52,10 +52,10 @@ export const BentoGridItem = ({
       {header}
       <div className="transition duration-200">
         {icon}
-        <div className="mb-2 mt-2 font-sans font-bold text-neutral-600 dark:text-neutral-200">
+        <strong className="mb-2 mt-2 block font-sans font-bold text-foreground">
           {title}
-        </div>
-        <div className="font-sans text-sm font-normal text-neutral-600 dark:text-neutral-300">
+        </strong>
+        <div className="font-sans text-sm font-normal text-foreground/80">
           {description}
         </div>
       </div>
@@ -66,15 +66,13 @@ export const BentoGridItem = ({
 export const Features = () => {
   return (
     <div className="mb-96 mt-32 flex w-full flex-col items-center justify-start">
-      <div className="flex flex-col items-center justify-center p-4">
-        <h2 className="mb-2 text-2xl font-bold text-primary">
-          Explore features
-        </h2>
-        <p className="max-w-md text-center text-white/90">
+      <div className="flex flex-col justify-center p-4 sm:items-center">
+        <h2 className="text-2xl font-bold text-primary">Explore features</h2>
+        <p className="mt-4 max-w-md text-balance text-foreground/80 sm:text-center">
           {`Exchange ideas with your team, collect feedback, and keep track of what you're working on.`}
         </p>
       </div>
-      <BentoGrid className="mx-auto max-w-4xl p-8">
+      <BentoGrid className="mx-auto max-w-4xl p-4 sm:p-8">
         {items.map((item, i) => (
           <BentoGridItem
             key={i}
