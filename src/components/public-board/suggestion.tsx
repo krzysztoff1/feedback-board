@@ -126,7 +126,7 @@ export const Suggestion = memo(
           </div>
 
           <DrawerContent className="flex min-h-[96vh] items-center justify-between">
-            <div className="max-h-[90vh] w-full max-w-[600px] overflow-y-auto px-2 pb-64">
+            <div className="max-h-[85vh] w-full max-w-[600px] overflow-y-auto px-2 pb-64">
               <DrawerHeader className="w-full text-left">
                 <DrawerTitle>{suggestion.title}</DrawerTitle>
               </DrawerHeader>

@@ -27,49 +27,13 @@ export const commentsRouter = createTRPCRouter({
         content,
       });
     }),
-  get: publicProcedure
-    .input(
-      z.object({
-        boardId: z.number(),
-        page: z.number(),
-        pageSize: z.number().min(1).max(100).optional().default(PAGE_SIZE),
-        sorting: z
-          .object({ desc: z.boolean(), id: z.string() })
-          .optional()
-          .default({ desc: true, id: "createdAt" }),
-      }),
-    )
-    .query(async ({ input, ctx }) => {
-      const orderByColumn = comments.createdAt;
-      const queryResult = await ctx.db
-        .select()
-        .from(comments)
-        .leftJoin(users, eq(comments.createdBy, users.id))
-        .orderBy(input.sorting.desc ? desc(orderByColumn) : asc(orderByColumn))
-        .where(eq(comments.boardId, input.boardId))
-        .limit(input.pageSize)
-        .offset(input.page * input.pageSize);
-
-      return queryResult.map(({ Comments, user }) => ({
-        id: Comments.id,
-        content: Comments.content,
-        createdBy: user?.name,
-        createdAt: Comments.createdAt,
-        user: {
-          id: user?.id,
-          name: user?.name,
-          image: user?.image,
-        },
-      }));
-    }),
-
   infinite: publicProcedure
     .input(
       z.object({
         boardId: z.number(),
         suggestionId: z.number(),
         limit: z.number().min(1).max(100).optional().default(PAGE_SIZE),
-        cursor: z.number(),
+        cursor: z.number().nullish(),
         sorting: z
           .object({ desc: z.boolean(), id: z.string() })
           .optional()
@@ -78,31 +42,75 @@ export const commentsRouter = createTRPCRouter({
     )
     .query(async ({ input, ctx }) => {
       const orderByColumn = comments.createdAt;
-      const queryResult = await ctx.db
-        .select()
+      const { cursor, limit } = input;
+      const [nextComments] = await Promise.all([
+        ctx.db
+          .select()
+          .from(comments)
+          .leftJoin(users, eq(comments.createdBy, users.id))
+          .orderBy(
+            input.sorting.desc ? desc(orderByColumn) : asc(orderByColumn),
+          )
+          .where(
+            and(
+              eq(comments.boardId, input.boardId),
+              eq(comments.suggestionId, input.suggestionId),
+            ),
+          )
+          .limit(limit + 1)
+          .offset(cursor ? cursor : 0),
+        ctx.db
+          .select({ _count: comments.id })
+          .from(comments)
+          .where(
+            and(
+              eq(comments.boardId, input.boardId),
+              eq(comments.suggestionId, input.suggestionId),
+            ),
+          ),
+      ]);
+
+      let nextCursor: typeof cursor = null;
+
+      if (nextComments.length > input.limit) {
+        nextComments.pop();
+
+        nextCursor = (cursor ?? 0) + input.limit;
+      }
+
+      return {
+        items: nextComments.map(({ Comments, user }) => ({
+          id: Comments.id,
+          content: Comments.content,
+          createdBy: user?.name,
+          createdAt: Comments.createdAt,
+          user: {
+            id: user?.id,
+            name: user?.name,
+            image: user?.image,
+          },
+        })),
+        nextCursor,
+      };
+    }),
+  getCount: publicProcedure
+    .input(
+      z.object({
+        boardId: z.number(),
+        suggestionId: z.number(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const query = await ctx.db
+        .select({ _count: comments.id })
         .from(comments)
-        .leftJoin(users, eq(comments.createdBy, users.id))
-        .orderBy(input.sorting.desc ? desc(orderByColumn) : asc(orderByColumn))
         .where(
           and(
             eq(comments.boardId, input.boardId),
             eq(comments.suggestionId, input.suggestionId),
           ),
-        )
-        .limit(input.limit)
-        .offset(input.cursor);
+        );
 
-      return queryResult.map(({ Comments, user }) => ({
-        id: Comments.id,
-        content: Comments.content,
-        createdBy: user?.name,
-        createdAt: Comments.createdAt,
-        user: {
-          id: user?.id,
-          name: user?.name,
-          image: user?.image,
-        },
-        nextCursor: input.cursor + input.limit,
-      }));
+      return query?.[0]?._count ?? 0;
     }),
 });
