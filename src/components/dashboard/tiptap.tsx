@@ -118,7 +118,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
   ];
 
   return (
-    <div className="flex space-x-2">
+    <div className="flex flex-wrap gap-2">
       {BUTTONS.map((button) => (
         <TooltipProvider key={button.name}>
           <Tooltip>
