@@ -27,42 +27,6 @@ export const commentsRouter = createTRPCRouter({
         content,
       });
     }),
-  get: publicProcedure
-    .input(
-      z.object({
-        boardId: z.number(),
-        page: z.number(),
-        pageSize: z.number().min(1).max(100).optional().default(PAGE_SIZE),
-        sorting: z
-          .object({ desc: z.boolean(), id: z.string() })
-          .optional()
-          .default({ desc: true, id: "createdAt" }),
-      }),
-    )
-    .query(async ({ input, ctx }) => {
-      const orderByColumn = comments.createdAt;
-      const queryResult = await ctx.db
-        .select()
-        .from(comments)
-        .leftJoin(users, eq(comments.createdBy, users.id))
-        .orderBy(input.sorting.desc ? desc(orderByColumn) : asc(orderByColumn))
-        .where(eq(comments.boardId, input.boardId))
-        .limit(input.pageSize)
-        .offset(input.page * input.pageSize);
-
-      return queryResult.map(({ Comments, user }) => ({
-        id: Comments.id,
-        content: Comments.content,
-        createdBy: user?.name,
-        createdAt: Comments.createdAt,
-        user: {
-          id: user?.id,
-          name: user?.name,
-          image: user?.image,
-        },
-      }));
-    }),
-
   infinite: publicProcedure
     .input(
       z.object({
