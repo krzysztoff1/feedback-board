@@ -10,6 +10,7 @@ import {
   CollapsibleTrigger,
 } from "../ui/collapsible";
 import { ChevronsUpDown, Loader } from "lucide-react";
+import { cn } from "~/lib/utils";
 
 interface SuggestionDrawerContentProps {
   readonly boardId: number;
@@ -26,11 +27,18 @@ export const SuggestionDrawerContent = memo(
         sorting: { desc: true, id: "createdAt" },
       },
       {
-        getNextPageParam: (lastPage) =>
-          lastPage?.[lastPage.length - 1]?.nextCursor,
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
         initialCursor: 0,
       },
     );
+
+    const comments =
+      commentsQuery.data?.pages.flatMap((page) => page.items) ?? [];
+
+    const commentCount = api.comments.getCount.useQuery({
+      boardId,
+      suggestionId: suggestion.id,
+    });
 
     return (
       <div className="p-4">
@@ -67,9 +75,9 @@ export const SuggestionDrawerContent = memo(
         <hr className="my-4" />
 
         <ul className="mt-8 space-y-8">
-          {commentsQuery.data?.pages
-            .flatMap((page) => page)
-            .map((comment) => <Comment key={comment.id} comment={comment} />)}
+          {comments.map((comment) => (
+            <Comment key={comment.id} comment={comment} />
+          ))}
         </ul>
 
         {commentsQuery.isFetchingNextPage || commentsQuery.isFetching ? (
@@ -78,20 +86,34 @@ export const SuggestionDrawerContent = memo(
           </div>
         ) : null}
 
+        {!commentsQuery.isFetchingNextPage &&
+          !commentsQuery.isFetching &&
+          !commentsQuery.data?.pages.flatMap((page) => page).length && (
+            <div className="mt-4 flex w-full items-center justify-center">
+              <span className="text-foreground/50">No comments found</span>
+            </div>
+          )}
+
         <div className="mt-4 flex w-full items-center justify-center">
           <Button
             onClick={async () => {
               await commentsQuery.fetchNextPage();
             }}
-            disabled={
-              commentsQuery.isFetchingNextPage || !commentsQuery.hasNextPage
-            }
+            disabled={!commentsQuery.hasNextPage}
             className="mt-4"
             variant={"outline"}
           >
             Load more
           </Button>
         </div>
+
+        <p
+          className={cn("text-sm text-foreground/50", {
+            "opacity-0": commentCount.status === "loading",
+          })}
+        >
+          {commentCount.data} comments
+        </p>
       </div>
     );
   },
