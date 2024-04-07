@@ -9,7 +9,7 @@ export const Comment = memo(
   ({
     comment,
   }: {
-    readonly comment: RouterOutput["comments"]["get"][number];
+    readonly comment: RouterOutput["comments"]["infinite"]["items"][number];
   }) => {
     const { user } = comment;
 
