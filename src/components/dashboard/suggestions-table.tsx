@@ -45,6 +45,7 @@ import {
   type SuggestionsStatus,
   suggestionStatusEnum,
 } from "~/server/db/schema";
+import { statusLabels } from "~/lib/labels";
 
 const prettyColumnNames: Record<string, string> = {
   title: "Title",
@@ -107,13 +108,17 @@ export const SuggestionTable = memo(
               value={row.getValue("status")}
             >
               <SelectTrigger>
-                <SelectValue>{row.getValue("status")}</SelectValue>
+                <SelectValue>
+                  {row.getValue("status")
+                    ? statusLabels[row.getValue("status") as SuggestionsStatus]
+                    : "None"}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {Object.values(suggestionStatusEnum.enumValues).map(
                   (status) => (
                     <SelectItem key={status} value={status}>
-                      {status}
+                      {statusLabels[status]}
                     </SelectItem>
                   ),
                 )}
