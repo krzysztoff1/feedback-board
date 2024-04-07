@@ -9,7 +9,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../ui/collapsible";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, Loader } from "lucide-react";
 
 interface SuggestionDrawerContentProps {
   readonly boardId: number;
@@ -71,6 +71,12 @@ export const SuggestionDrawerContent = memo(
             .flatMap((page) => page)
             .map((comment) => <Comment key={comment.id} comment={comment} />)}
         </ul>
+
+        {commentsQuery.isFetchingNextPage || commentsQuery.isFetching ? (
+          <div className="mt-4 flex w-full items-center justify-center">
+            <Loader className="mr-2 animate-spin" size={16} />
+          </div>
+        ) : null}
 
         <div className="mt-4 flex w-full items-center justify-center">
           <Button
