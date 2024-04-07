@@ -25,71 +25,27 @@ import { api } from "~/trpc/react";
 import { useParams } from "next/navigation";
 import { Skeleton } from "../ui/skeleton";
 import { PAGE_SIZE } from "~/lib/constants";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, DotIcon } from "lucide-react";
 import { truncate } from "~/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-
-type Row = RouterOutput["suggestions"]["get"][number];
-
-export const columns: ColumnDef<Row>[] = [
-  {
-    accessorKey: "title",
-    header: "Title",
-    size: 50,
-    minSize: 50,
-    maxSize: 50,
-    cell: ({ row }) => <b>{row.getValue("title")}</b>,
-  },
-  {
-    accessorKey: "content",
-    header: "Content",
-    size: 50,
-    cell: ({ row }) => truncate(row.getValue("content")),
-  },
-  {
-    accessorKey: "user.name",
-    size: 50,
-    header: "User",
-  },
-  {
-    accessorKey: "upVotes",
-    size: 50,
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Votes
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "createdAt",
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("createdAt"));
-      return date.toLocaleDateString();
-    },
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Created At
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-];
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import {
+  type SuggestionsStatus,
+  suggestionStatusEnum,
+} from "~/server/db/schema";
 
 const prettyColumnNames: Record<string, string> = {
   title: "Title",
@@ -122,6 +78,130 @@ export const SuggestionTable = memo(
       pageSize: pagination.pageSize,
       sorting: sorting?.[0],
     });
+    const editStatusMutation = api.suggestions.editStatus.useMutation();
+
+    const columns: ColumnDef<RouterOutput["suggestions"]["get"][number]>[] = [
+      {
+        accessorKey: "id",
+        header: "ID",
+        size: 50,
+        minSize: 50,
+        maxSize: 50,
+        enableHiding: true,
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        size: 50,
+        minSize: 50,
+        maxSize: 50,
+        cell: ({ row }) => {
+          return (
+            <Select
+              onValueChange={async (value) => {
+                await editStatusMutation.mutateAsync({
+                  suggestionId: row.getValue("id"),
+                  status: value as SuggestionsStatus,
+                });
+                await suggestions.refetch();
+              }}
+              value={row.getValue("status")}
+            >
+              <SelectTrigger>
+                <SelectValue>{row.getValue("status")}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(suggestionStatusEnum.enumValues).map(
+                  (status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ),
+                )}
+              </SelectContent>
+            </Select>
+          );
+        },
+      },
+      {
+        accessorKey: "title",
+        header: "Title",
+        size: 50,
+        minSize: 50,
+        maxSize: 50,
+        cell: ({ row }) => <b>{row.getValue("title")}</b>,
+      },
+      {
+        accessorKey: "content",
+        header: "Content",
+        size: 50,
+        cell: ({ row }) => truncate(row.getValue("content")),
+      },
+      {
+        accessorKey: "user.name",
+        size: 50,
+        header: "User",
+      },
+      {
+        accessorKey: "upVotes",
+        size: 50,
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Votes
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          );
+        },
+      },
+      {
+        accessorKey: "createdAt",
+        cell: ({ row }) => {
+          const date = new Date(row.getValue("createdAt"));
+          return date.toLocaleDateString();
+        },
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Created At
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          );
+        },
+      },
+      {
+        id: "actions",
+        enableHiding: false,
+        cell: ({ row }) => {
+          const suggestion = row.original;
+
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <DotIcon className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem>View payment details</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      },
+    ];
 
     const table = useReactTable({
       data: suggestions?.data ?? [],

@@ -50,6 +50,17 @@ export const boards = createTable(
   }),
 );
 
+export const suggestionStatusEnum = pgEnum("suggestionStatusEnum", [
+  "backlog",
+  "todo",
+  "inProgress",
+  "done",
+  "cancelled",
+]);
+
+export type SuggestionsStatus =
+  (typeof suggestionStatusEnum.enumValues)[number];
+
 export const suggestions = createTable(
   "suggestions",
   {
@@ -67,6 +78,7 @@ export const suggestions = createTable(
       .notNull(),
     updatedAt: timestamp("updatedAt"),
     upVotes: integer("upVotes").default(0),
+    status: suggestionStatusEnum("status"),
   },
   (example) => ({
     boardIdIdx: index("boardId_idx").on(example.boardId),

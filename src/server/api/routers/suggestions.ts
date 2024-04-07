@@ -6,7 +6,12 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { suggestions, suggestionsUpVotes, users } from "~/server/db/schema";
+import {
+  suggestionStatusEnum,
+  suggestions,
+  suggestionsUpVotes,
+  users,
+} from "~/server/db/schema";
 
 export const suggestionsRouter = createTRPCRouter({
   create: protectedProcedure
@@ -108,11 +113,7 @@ export const suggestionsRouter = createTRPCRouter({
       ]);
 
       return targetSuggestions.map(({ suggestions, user }) => ({
-        id: suggestions.id,
-        title: suggestions.title,
-        content: suggestions.content,
-        upVotes: suggestions.upVotes,
-        createdAt: suggestions.createdAt,
+        ...suggestions,
         isUpVoted: userUpVotes.some(
           (upVote) => upVote.suggestionId === suggestions.id,
         ),
@@ -234,5 +235,23 @@ export const suggestionsRouter = createTRPCRouter({
         totalSuggestions: totalSuggestions[0]?._count,
         totalUpvotes: totalUpvotes[0]?._count,
       };
+    }),
+  editStatus: protectedProcedure
+    .input(
+      z.object({
+        suggestionId: z.number(),
+        status: z.enum(suggestionStatusEnum.enumValues),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { suggestionId, status } = input;
+      const uid = ctx.session.user.id;
+
+      await ctx.db
+        .update(suggestions)
+        .set({ status })
+        .where(
+          and(eq(suggestions.id, suggestionId), eq(suggestions.createdBy, uid)),
+        );
     }),
 });
